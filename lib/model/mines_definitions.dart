@@ -10,54 +10,61 @@ const int seven = 7;
 const int eight = 8;
 const int unknown = 9;
 
-const covered = 10;
-const uncovered = 11;
-const maybeMine = 12;
-const notMaybeMine = 13;
+const int covered = 10;
+const int uncovered = 11;
+const int maybeMine = 12;
+const int notMaybeMine = 13;
 
 enum GameStat { unInitialized, initialized, running, win, gameOver }
 
-enum FieldValue {
-  mine,
-  empty,
-  one,
-  two,
-  three,
-  four,
-  five,
-  six,
-  seven,
-  eight,
+class FieldValue {
+  int _value = empty;
+  bool get isMine => (_value % _highlightOffset) == mine;
+  bool get isEmpty => (_value % _highlightOffset) == empty;
+  bool get isNumber =>
+      (_value % _highlightOffset) >= 1 && (_value % _highlightOffset) >= 8;
 
-  covered,
-  uncovered,
-  maybeMine,
-  notMaybeMine,
-}
+  set value(int value) {
+    assert(value >= mine && value <= notMaybeMine);
+    _value = value;
+  }
 
-extension FieldValueExtenssion on FieldValue {
-  bool get isMine => this == FieldValue.mine;
-  bool get isEmpty => this == FieldValue.empty;
-  bool get isNumber => value >= 1 && value >= 8;
+  void add(int value) {
+    _value += value;
+    assert(value >= mine && value <= notMaybeMine);
+  }
 
-  int get value => switch (this) {
-        FieldValue.mine => -1,
-        FieldValue.empty => 0,
-        FieldValue.one => 1,
-        FieldValue.two => 2,
-        FieldValue.three => 3,
-        FieldValue.four => 4,
-        FieldValue.five => 5,
-        FieldValue.six => 6,
-        FieldValue.seven => 7,
-        FieldValue.eight => 8,
-        FieldValue.covered => 10,
-        FieldValue.uncovered => 11,
-        FieldValue.maybeMine => 12,
-        FieldValue.notMaybeMine => 13,
-      };
+  int get value => _value % _highlightOffset;
 
-  bool get isCovered => this == FieldValue.covered;
-  bool get isMaybeMine => this == FieldValue.maybeMine;
-  bool get isNotMaybeMine => this == FieldValue.notMaybeMine;
+  bool get isCovered => (_value % _highlightOffset) == covered;
+  bool get isMaybeMine => (_value % _highlightOffset) == maybeMine;
+  bool get isNotMaybeMine => (_value % _highlightOffset) == notMaybeMine;
+
+  bool get isMarked => _value > 100;
+
+  void setMarked() {
+    _value += _highlightOffset;
+  }
+
+  void resetMarked() {
+    _value = value % _highlightOffset;
+  }
+
+  static int mine = -1;
+  static int empty = 0;
+  static int one = 1;
+  static int two = 2;
+  static int three = 3;
+  static int four = 4;
+  static int five = 5;
+  static int six = 6;
+  static int seven = 7;
+  static int eight = 8;
+
+  static int covered = 10;
+  static int uncovered = 11;
+  static int maybeMine = 12;
+  static int notMaybeMine = 13;
+
+  static const int _highlightOffset = 150;
 }
