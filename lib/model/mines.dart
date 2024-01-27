@@ -42,6 +42,7 @@ class MinesGame extends ChangeNotifier {
     _gameField.initFromMineField(_mineField, xs, ys);
     _gameStatus = GameStat.initialized;
     _gameStatus = GameStat.running;
+    _pushToUndoStack();
     notifyListeners();
   }
 
@@ -123,14 +124,14 @@ class MinesGame extends ChangeNotifier {
 
   void replayGame() {
     if (gameStatus == GameStat.unInitialized) return;
-
-    _gameField.fillWith(covered);
-    _gameStatus = GameStat.initialized;
+    _popAllButOneFromUndoStack();
+    _gameStatus = GameStat.running;
     notifyListeners();
   }
 
   void undo() {
     _popFromUndoStack();
+    _gameStatus = GameStat.running;
     notifyListeners();
   }
 
@@ -192,13 +193,16 @@ class MinesGame extends ChangeNotifier {
 
   void _pushToUndoStack() {
     _undoStack.add(_gameField.clone());
-    notifyListeners();
   }
 
   void _popFromUndoStack() {
     if (_undoStack.isEmpty) return;
     _gameField = _undoStack.removeLast();
-    _gameStatus = GameStat.running;
-    notifyListeners();
+  }
+
+  void _popAllButOneFromUndoStack() {
+    while (_undoStack.length > 1) {
+      _gameField = _undoStack.removeLast();
+    }
   }
 }

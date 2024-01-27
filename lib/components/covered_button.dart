@@ -84,10 +84,13 @@ class _MineButtonPainter extends CustomPainter {
     paintEmpty(canvas, size);
 
     if (fieldValue > 100) {
+      var ox = 0.1 * size.width, oy = 0.1 * size.height;
+
       var paint = Paint()
         ..color = Colors.yellow
         ..style = PaintingStyle.fill;
-      var rect = Rect.fromLTWH(0, 0, size.width, size.height);
+      var rect =
+          Rect.fromLTWH(ox, oy, size.width - 2 * ox, size.height - 2 * oy);
       canvas.drawRect(rect, paint);
       fieldValue = fieldValue % 150;
     }
