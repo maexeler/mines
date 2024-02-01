@@ -13,15 +13,15 @@ class MinesFooter extends StatelessWidget {
         children: [
           ElevatedButton(
             onPressed: () {
-              minesGame.replayGame();
+              minesGame.resetGame();
             },
-            child: const Text("Try again"),
+            child: const Text("New Game"),
           ),
           ElevatedButton(
             onPressed: () {
-              minesGame.resetGame();
+              minesGame.replayGame();
             },
-            child: const Text("Reset Game"),
+            child: const Text("Try again"),
           ),
           ElevatedButton(
             onPressed: minesGame.canUndo

@@ -28,32 +28,32 @@ class MinesGame extends ChangeNotifier {
   void startNewGame(int xs, int ys, double percent) {
     assert(xs >= 0 && xs < _w);
     assert(ys >= 0 && ys < _h);
-
     // Generate and solve the game
     do {
       _generateNewGame(xs, ys, percent);
     } while (!_gameField.solveGame());
 
     if (kDebugMode) {
+      print('Game solved:');
       _gameField.dump();
     }
 
     // now start the game
     _gameField.initFromMineField(_mineField, xs, ys);
+
     _gameStatus = GameStat.initialized;
     _gameStatus = GameStat.running;
+    _remainingMines = _mineField.mines;
     _pushToUndoStack();
+    _checkForWin(); // It may happen, that we have won on start
     notifyListeners();
   }
 
   void uncoverField(int x, int y) {
     if (gameStatus == GameStat.unInitialized) {
       startNewGame(x, y, 20);
-      _gameField.markSolvableField();
       return;
     }
-
-    _gameField.unMarkSolvableField();
 
     if (gameStatus == GameStat.initialized) {
       _gameStatus = GameStat.running;
@@ -66,38 +66,41 @@ class MinesGame extends ChangeNotifier {
     assert(x >= 0 && x < _w);
     assert(y >= 0 && y < _h);
     final value = _gameField.getField(x, y);
-    if (value >= empty && value < eight || value == maybeMine) {
+    if (value.isNumber || value.isMaybeMine) {
       return;
-    } else if (_mineField.getField(x, y) == mine) {
+    } else if (_mineField.getField(x, y).isMine) {
       _gameOver();
-    } else if (value == maybeMine) {
-      _gameField.setField(x, y, covered);
-    } else if (value == covered) {
+    } else if (value.isMaybeMine) {
+      _gameField.setField(x, y, FieldValue.covered);
+      //_gameField.calculateHints();
+    } else if (value.isCovered) {
       _gameField.copyAndExpand(x, y, {});
+      _gameField.calculateHints();
       _checkForWin();
     }
-    _gameField.markSolvableField();
     notifyListeners();
   }
 
-  toggleMayBeMine(int x, int y) {
-    _gameField.unMarkSolvableField();
-
+  void toggleMayBeMine(int x, int y) {
     if (gameStatus != GameStat.running) {
       return;
     }
 
     var value = _gameField.getField(x, y);
-    if (value != covered && value != maybeMine) return;
+    if (value.isCovered && value.isMaybeMine) return;
 
-    if (value == covered) {
+    if (value.isCovered) {
+      // if (_remainingMines <= 0) { // TODO
+      //   return;
+      // }
       _pushToUndoStack();
-      _gameField.setField(x, y, maybeMine);
-    } else if (value == maybeMine) {
+      _gameField.setField(x, y, FieldValue.maybeMine);
+      _remainingMines--;
+    } else if (value.isMaybeMine) {
       _pushToUndoStack();
-      _gameField.setField(x, y, covered);
+      _gameField.setField(x, y, FieldValue.covered);
+      _remainingMines++;
     }
-    _gameField.markSolvableField();
     notifyListeners();
   }
 
@@ -105,7 +108,7 @@ class MinesGame extends ChangeNotifier {
   int get height => _h;
   GameStat get gameStatus => _state;
   int get remainingMines => _remainingMines;
-  int valueAt(int x, int y) => _gameField.getField(x, y);
+  FieldValue valueAt(int x, int y) => _gameField.getField(x, y);
 
   /// Change the size of the game
   void changeGameDimensions(int w, int h) {
@@ -125,6 +128,7 @@ class MinesGame extends ChangeNotifier {
   void replayGame() {
     if (gameStatus == GameStat.unInitialized) return;
     _popAllButOneFromUndoStack();
+    _remainingMines = _mineField.mines;
     _gameStatus = GameStat.running;
     notifyListeners();
   }
@@ -144,27 +148,18 @@ class MinesGame extends ChangeNotifier {
   }
 
   void _gameOver() {
-    for (int x = 0; x < _w; x++) {
-      for (int y = 0; y < _h; y++) {
-        if (_gameField.getField(x, y) == maybeMine &&
-            _mineField.getField(x, y) != mine) {
-          _gameField.setField(x, y, notMaybeMine);
-        } else {
-          _gameField.setField(x, y, _mineField.getField(x, y));
-        }
-      }
-    }
+    _gameField.markGameOver();
     _gameStatus = GameStat.gameOver;
   }
 
   void _checkForWin() {
     for (int x = 0; x < _w; x++) {
       for (int y = 0; y < _h; y++) {
-        if (_gameField.getField(x, y) == covered &&
-            _mineField.getField(x, y) != mine) return;
+        if (_gameField.getField(x, y).isCovered &&
+            _mineField.getField(x, y).isNotMine) return;
       }
     }
-    // Only covered mines remaining -> win
+    // Only covered mines remaining, we have a win
     _gameStatus = GameStat.win;
     notifyListeners();
   }

@@ -7,7 +7,7 @@ import 'package:mines/pages/mines_page/mines_page.dart';
 
 void main() {
   MinesTimer minesTimer = MinesTimer();
-  MinesGame minesGame = MinesGame(7, 12, timer: minesTimer);
+  MinesGame minesGame = MinesGame(5, 6, timer: minesTimer);
 
   runApp(
     MultiProvider(

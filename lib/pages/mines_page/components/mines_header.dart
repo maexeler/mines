@@ -37,7 +37,9 @@ class _StatusDisplay extends StatelessWidget {
           child: Text(
         minesGame.gameStatus == GameStat.gameOver
             ? '🙁'
-            : '${minesGame.gameStatus}',
+            : minesGame.gameStatus == GameStat.win
+                ? '😀😀😀'
+                : '😀 ${minesGame.gameStatus}',
       )),
     );
   }
@@ -47,7 +49,8 @@ class _RemainingMinesDisplay extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Consumer<MinesGame>(
-      builder: (context, minesGame, child) => const Text('000'),
+      builder: (context, minesGame, child) =>
+          Text('${minesGame.remainingMines}'),
     );
   }
 }

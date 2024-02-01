@@ -56,7 +56,7 @@ class _MineButttonState extends State<MineButton> {
 
 class _MineButtonPainter extends CustomPainter {
   _MineButtonPainter(this.fieldValue);
-  int fieldValue;
+  FieldValue fieldValue;
 
   static Color greyLite = Colors.white;
   static Color greyButton = Colors.grey.shade300;
@@ -83,7 +83,7 @@ class _MineButtonPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     paintEmpty(canvas, size);
 
-    if (fieldValue > 100) {
+    if (fieldValue.isMarked) {
       var ox = 0.1 * size.width, oy = 0.1 * size.height;
 
       var paint = Paint()
@@ -92,32 +92,31 @@ class _MineButtonPainter extends CustomPainter {
       var rect =
           Rect.fromLTWH(ox, oy, size.width - 2 * ox, size.height - 2 * oy);
       canvas.drawRect(rect, paint);
-      fieldValue = fieldValue % 150;
     }
 
-    if (fieldValue == covered) {
+    if (fieldValue.isCovered) {
       paintCovered(canvas, size);
-    } else if (fieldValue == mine) {
+    } else if (fieldValue.isMine) {
       paintMine(canvas, size);
-    } else if (fieldValue == maybeMine) {
+    } else if (fieldValue.isMaybeMine) {
       paintMayBeMine(canvas, size);
-    } else if (fieldValue >= one && fieldValue <= eight) {
-      paintField(canvas, size, fieldValue);
-    } else if (fieldValue == notMaybeMine) {
+    } else if (fieldValue.isNumber) {
+      paintField(canvas, size, fieldValue.value);
+    } else if (fieldValue.isNotMaybeMine) {
       paintNotMayBeMine(canvas, size);
     }
   }
 
   void paintMine(Canvas canvas, Size size) {
-    paintField(canvas, size, mine, anyChar: 'm');
+    paintField(canvas, size, FieldValue.mine, anyChar: 'm'); // TODO
   }
 
   void paintMayBeMine(Canvas canvas, Size size) {
-    paintField(canvas, size, mine, anyChar: 'f');
+    paintField(canvas, size, FieldValue.mine, anyChar: 'f'); // TODO
   }
 
   void paintNotMayBeMine(Canvas canvas, Size size) {
-    paintField(canvas, size, mine, anyChar: 'nf');
+    paintField(canvas, size, FieldValue.mine, anyChar: 'nf'); // TODO
   }
 
   void paintField(Canvas canvas, Size size, int value, {String? anyChar}) {

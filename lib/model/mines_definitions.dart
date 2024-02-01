@@ -1,56 +1,43 @@
-const int mine = -1;
-const int empty = 0;
-const int one = 1;
-const int two = 2;
-const int three = 3;
-const int four = 4;
-const int five = 5;
-const int six = 6;
-const int seven = 7;
-const int eight = 8;
-const int unknown = 9;
-
-const int covered = 10;
-const int uncovered = 11;
-const int maybeMine = 12;
-const int notMaybeMine = 13;
-
 enum GameStat { unInitialized, initialized, running, win, gameOver }
 
 class FieldValue {
   int _value = empty;
   bool get isMine => (_value % _highlightOffset) == mine;
+  bool get isNotMine => !isMine;
   bool get isEmpty => (_value % _highlightOffset) == empty;
   bool get isNumber =>
-      (_value % _highlightOffset) >= 1 && (_value % _highlightOffset) >= 8;
+      (_value % _highlightOffset) >= 1 && (_value % _highlightOffset) <= 8;
+  bool get isNotNumber => !isNumber;
 
+  bool get isCovered => (_value % _highlightOffset) == covered;
+  bool get isUncovered => !isCovered;
+  bool get isMaybeMine => (_value % _highlightOffset) == maybeMine;
+  bool get isNotMaybeMine => (_value % _highlightOffset) == notMaybeMine;
+
+  // Value handling
   set value(int value) {
-    assert(value >= mine && value <= notMaybeMine);
+    assert(value >= empty && value <= notMaybeMine);
     _value = value;
   }
 
   void add(int value) {
     _value += value;
-    assert(value >= mine && value <= notMaybeMine);
+    assert(isNumber);
   }
 
   int get value => _value % _highlightOffset;
 
-  bool get isCovered => (_value % _highlightOffset) == covered;
-  bool get isMaybeMine => (_value % _highlightOffset) == maybeMine;
-  bool get isNotMaybeMine => (_value % _highlightOffset) == notMaybeMine;
-
+  // Handle marking
   bool get isMarked => _value > 100;
 
-  void setMarked() {
-    _value += _highlightOffset;
+  void mark() {
+    _value = value + _highlightOffset;
   }
 
-  void resetMarked() {
+  void unMark() {
     _value = value % _highlightOffset;
   }
 
-  static int mine = -1;
   static int empty = 0;
   static int one = 1;
   static int two = 2;
@@ -60,6 +47,7 @@ class FieldValue {
   static int six = 6;
   static int seven = 7;
   static int eight = 8;
+  static int mine = 9;
 
   static int covered = 10;
   static int uncovered = 11;

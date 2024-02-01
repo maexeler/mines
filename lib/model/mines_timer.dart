@@ -32,7 +32,7 @@ class MinesTimer extends ChangeNotifier {
   void _incrementSeconds(Timer timer) {
     if (_running) {
       _secondsSinceStart++;
-      // notifyListeners();
+      notifyListeners();
     }
   }
 }
