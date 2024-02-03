@@ -5,6 +5,7 @@ class FieldValue {
   bool get isMine => (_value % _highlightOffset) == mine;
   bool get isNotMine => !isMine;
   bool get isEmpty => (_value % _highlightOffset) == empty;
+  bool get isNotEmpty => !isEmpty;
   bool get isNumber =>
       (_value % _highlightOffset) >= 1 && (_value % _highlightOffset) <= 8;
   bool get isNotNumber => !isNumber;

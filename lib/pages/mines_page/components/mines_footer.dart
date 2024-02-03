@@ -24,6 +24,14 @@ class MinesFooter extends StatelessWidget {
             child: const Text("Try again"),
           ),
           ElevatedButton(
+            onPressed: () {
+              minesGame.toggleHints();
+            },
+            child: minesGame.showHints
+                ? const Text("Hide hints")
+                : const Text("Show hints"),
+          ),
+          ElevatedButton(
             onPressed: minesGame.canUndo
                 ? () {
                     minesGame.undo();

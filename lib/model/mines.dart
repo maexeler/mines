@@ -10,7 +10,8 @@ class MinesGame extends ChangeNotifier {
   GameStat _state;
   final MinesTimer? _timer;
   int _remainingMines = 0;
-  final _undoStack = <GameField>[];
+  final _undoStack = <(int, GameField)>[];
+  bool _showHints = false;
 
   MinesGame(this._w, this._h, {MinesTimer? timer})
       : _mineField = MineField(_w, _h),
@@ -40,6 +41,7 @@ class MinesGame extends ChangeNotifier {
 
     // now start the game
     _gameField.initFromMineField(_mineField, xs, ys);
+    if (_showHints) _gameField.calculateHints();
 
     _gameStatus = GameStat.initialized;
     _gameStatus = GameStat.running;
@@ -72,10 +74,10 @@ class MinesGame extends ChangeNotifier {
       _gameOver();
     } else if (value.isMaybeMine) {
       _gameField.setField(x, y, FieldValue.covered);
-      //_gameField.calculateHints();
+      _processHints();
     } else if (value.isCovered) {
       _gameField.copyAndExpand(x, y, {});
-      _gameField.calculateHints();
+      _processHints();
       _checkForWin();
     }
     notifyListeners();
@@ -90,16 +92,18 @@ class MinesGame extends ChangeNotifier {
     if (value.isCovered && value.isMaybeMine) return;
 
     if (value.isCovered) {
-      // if (_remainingMines <= 0) { // TODO
-      //   return;
-      // }
+      if (_remainingMines <= 0) {
+        return;
+      }
       _pushToUndoStack();
       _gameField.setField(x, y, FieldValue.maybeMine);
       _remainingMines--;
+      _processHints();
     } else if (value.isMaybeMine) {
       _pushToUndoStack();
       _gameField.setField(x, y, FieldValue.covered);
       _remainingMines++;
+      _processHints();
     }
     notifyListeners();
   }
@@ -150,6 +154,23 @@ class MinesGame extends ChangeNotifier {
   void _gameOver() {
     _gameField.markGameOver();
     _gameStatus = GameStat.gameOver;
+    notifyListeners();
+  }
+
+  bool get showHints => _showHints;
+
+  void toggleHints() {
+    _showHints = !_showHints;
+    _processHints();
+    notifyListeners();
+  }
+
+  void _processHints() {
+    if (_showHints) {
+      _gameField.calculateHints();
+    } else {
+      _gameField.resetHints();
+    }
   }
 
   void _checkForWin() {
@@ -161,6 +182,7 @@ class MinesGame extends ChangeNotifier {
     }
     // Only covered mines remaining, we have a win
     _gameStatus = GameStat.win;
+    _gameField.resetHints();
     notifyListeners();
   }
 
@@ -187,17 +209,19 @@ class MinesGame extends ChangeNotifier {
   }
 
   void _pushToUndoStack() {
-    _undoStack.add(_gameField.clone());
+    _undoStack.add((_remainingMines, _gameField.clone()));
   }
 
   void _popFromUndoStack() {
     if (_undoStack.isEmpty) return;
-    _gameField = _undoStack.removeLast();
+    var elem = _undoStack.removeLast();
+    _remainingMines = elem.$1;
+    _gameField = elem.$2;
   }
 
   void _popAllButOneFromUndoStack() {
     while (_undoStack.length > 1) {
-      _gameField = _undoStack.removeLast();
+      _popFromUndoStack();
     }
   }
 }

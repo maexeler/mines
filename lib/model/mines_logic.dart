@@ -87,6 +87,7 @@ class MineField extends _Grid {
     var mines = _mines = (w * h * percent / 100).round();
     // Start empty
     fillWith(FieldValue.empty);
+
     // Fill in mines
     while (mines > 0) {
       // No bomb at start position and only one bomb at each location
@@ -113,7 +114,6 @@ class MineField extends _Grid {
 
 class GameField extends _Grid {
   MineField mineField;
-  bool showHints = true;
 
   GameField(int w, int h)
       : mineField = MineField(w, h), // will be replaced later
@@ -123,42 +123,40 @@ class GameField extends _Grid {
     this.mineField = mineField;
     fillWith(FieldValue.covered);
     // Transfer the start value
-    copyAndExpand(xs, ys, <_FieldIndex>{});
-  }
-
-  @override
-  void setField(int x, int y, int value) {
-    super.setField(x, y, value);
-    calculateHints();
-  }
-
-  void toggleHelp() {
-    showHints = !showHints;
-  }
-
-  void copyAndExpand(int x, int y, Set<(int, int)> allreadyProcessed) {
-    setField(x, y, mineField.getField(x, y).value);
-    allreadyProcessed.add((x, y));
-    Set<_FieldIndex> neighbors = mineField.getNeighbors(x, y, (value) {
-      return value.isNumber;
+    setField(xs, ys, mineField.getField(xs, ys).value);
+    Set<_FieldIndex> neighbors = mineField.getNeighbors(xs, ys, (value) {
+      return xs >= 0 && xs < w && ys >= 0 && ys < h && value.isNumber;
     });
-    neighbors = neighbors.difference(allreadyProcessed);
     for (var element in neighbors) {
       setField(element.$1, element.$2,
           mineField.getField(element.$1, element.$2).value);
     }
-    allreadyProcessed.addAll(neighbors);
-    neighbors = mineField.getNeighbors(x, y, (value) {
-      return value.isEmpty;
+  }
+
+  /// if a field is not empty, copy it
+  /// otherwise copy and expand it recursivly
+  void copyAndExpand(int x, int y, Set<(int, int)> allreadyProcessed) {
+    if (x < 0 || x >= w || y < 0 || y >= h) return;
+
+    // terminate recursion
+    if (allreadyProcessed.contains((x, y))) return;
+
+    var field = mineField.getField(x, y);
+    setField(x, y, field.value);
+    allreadyProcessed.add((x, y));
+
+    if (field.isNotEmpty) return;
+
+    // we are on an empty field, copy and expand recursivly
+    Set<_FieldIndex> neighbors = mineField.getNeighbors(x, y, (value) {
+      return x >= 0 && x < w && y >= 0 && y < h;
     });
-    neighbors = neighbors.difference(allreadyProcessed);
     for (var element in neighbors) {
       copyAndExpand(element.$1, element.$2, allreadyProcessed);
     }
   }
 
   void markGameOver() {
-    _resetHints();
     for (int x = 0; x < w; x++) {
       for (int y = 0; y < h; y++) {
         if (getField(x, y).isMaybeMine && mineField.getField(x, y).isNotMine) {
@@ -168,6 +166,7 @@ class GameField extends _Grid {
         }
       }
     }
+    resetHints();
   }
 
   bool solveGame() {
@@ -187,8 +186,9 @@ class GameField extends _Grid {
           continue;
         }
         // Check if all covered fields are mines
-        if (fieldInfo.fieldValue - fieldInfo.mayBeMines ==
-            fieldInfo.coveredFields.length) {
+        if (fieldInfo.coveredFields.isNotEmpty &&
+            (fieldInfo.fieldValue - fieldInfo.mayBeMines ==
+                fieldInfo.coveredFields.length)) {
           for (var (xl, yl) in fieldInfo.coveredFields) {
             // Mark them as mayBeMines
             _fields[xl][yl].value = FieldValue.maybeMine;
@@ -196,7 +196,8 @@ class GameField extends _Grid {
           return true;
         }
         // Check if remaining field may savely be uncovered
-        if (fieldInfo.mayBeMines == fieldInfo.fieldValue) {
+        if (fieldInfo.coveredFields.isNotEmpty &&
+            (fieldInfo.mayBeMines == fieldInfo.fieldValue)) {
           for (var (xl, yl) in fieldInfo.coveredFields) {
             copyAndExpand(xl, yl, {});
           }
@@ -208,7 +209,7 @@ class GameField extends _Grid {
   }
 
   bool _markSolvableField() {
-    var progress = false; // TODO
+    var progress = false;
 
     // Loop over logical coordinates
     for (int x = 0; x < w; x++) {
@@ -289,7 +290,7 @@ class GameField extends _Grid {
     }
   }
 
-  void _resetHints() {
+  void resetHints() {
     for (int x = 0; x < w; x++) {
       for (int y = 0; y < h; y++) {
         _fields[x][y].unMark();
@@ -298,10 +299,7 @@ class GameField extends _Grid {
   }
 
   void calculateHints() {
-    _resetHints();
-    if (!showHints) {
-      return;
-    }
+    resetHints();
     _markSolvableField();
   }
 }
