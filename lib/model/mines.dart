@@ -54,7 +54,7 @@ class MinesGame extends ChangeNotifier {
   }
 
   void uncoverField(int x, int y) {
-    if (gameStatus == GameStat.layouted) {
+    if (gameStatus == GameStat.layouted || gameStatus == GameStat.initialized) {
       startNewGame(x, y, settings.percentMines);
       return;
     }
@@ -122,7 +122,7 @@ class MinesGame extends ChangeNotifier {
     _w = w;
     _h = h;
     resetGame();
-    _gameStatus = GameStat.layouted;
+    _gameStatus = GameStat.initialized;
     notifyListeners();
   }
 
@@ -158,6 +158,7 @@ class MinesGame extends ChangeNotifier {
   void _gameOver() {
     _gameField.markGameOver();
     _gameStatus = GameStat.gameOver;
+    Vibration.vibrate(duration: 300);
     notifyListeners();
   }
 
@@ -187,6 +188,7 @@ class MinesGame extends ChangeNotifier {
     // Only covered mines remaining, we have a win
     _gameStatus = GameStat.win;
     _gameField.resetHints();
+    Vibration.vibrate(duration: 300);
     notifyListeners();
   }
 

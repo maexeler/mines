@@ -9,8 +9,8 @@ import 'package:mines/pages/mines_page/mines_page.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  SettingsProvider settingsProvider = await SettingsProvider()
-    ..initialize();
+  SettingsProvider settingsProvider = SettingsProvider();
+  settingsProvider.initialize();
 
   MinesTimer minesTimer = MinesTimer();
   MinesGame minesGame =

@@ -30,16 +30,13 @@ class MinesFieldLayout extends StatelessWidget {
     int w = minesGame.width, h = minesGame.height;
     if (minesGame.gameStatus == GameStat.unInitialized) {
       var settings = Provider.of<SettingsProvider>(context);
+      print('settings.percentCellSize ${settings.percentCellSize}');
       return CustomMultiChildLayout(
-        delegate: _MinesFieldLayoutCalculatorDelegate(
-          minesGame,
-          settings.maxCellsForShortSide,
-          settings.percentCellSize,
-        ),
+        delegate: _MinesFieldLayoutCalculatorDelegate(minesGame, settings),
         children: [
           LayoutId(
             id: 'body',
-            child: Container(color: Colors.orange),
+            child: Container(),
           ),
         ],
       );
@@ -67,23 +64,27 @@ class MinesFieldLayout extends StatelessWidget {
 }
 
 class _MinesFieldLayoutCalculatorDelegate extends MultiChildLayoutDelegate {
-  _MinesFieldLayoutCalculatorDelegate(
-      this.minesGame, this.cellsForShortSide, this.percentCellSize);
+  _MinesFieldLayoutCalculatorDelegate(this.minesGame, this.settings);
   final MinesGame minesGame;
-  final double percentCellSize;
-  final double cellsForShortSide;
+  final SettingsProvider settings;
 
   @override
   void performLayout(Size size) {
     var shortSide = size.shortestSide;
     var longestSide = size.longestSide;
-    var cellSize = shortSide / cellsForShortSide;
-    cellSize += cellSize * percentCellSize;
+    var cellSize = settings.calcCellSize(shortSide);
     int w = (shortSide / cellSize).floor();
     int h = (longestSide / cellSize).floor();
+    print('_MinesFieldLayoutCalculatorDelegate ${w}, ${h}');
     SchedulerBinding.instance.addPostFrameCallback((_) {
       minesGame.changeGameDimensions(w, h);
     });
+
+    layoutChild(
+      'body',
+      BoxConstraints(maxHeight: size.height, maxWidth: size.width),
+    );
+    positionChild('body', Offset(0, 0));
   }
 
   @override
@@ -99,7 +100,7 @@ class _MinesFieldLayoutDelegate extends MultiChildLayoutDelegate {
   @override
   void performLayout(Size size) {
     var fieldSize = min(size.width / w, size.height / h);
-    double dx = size.shortestSide / fieldSize / 2;
+    double dx = (size.shortestSide - (fieldSize * w)) / 2;
     for (int x = 0; x < w; x++) {
       for (int y = 0; y < h; y++) {
         // layoutChild must be called exactly once for each child.

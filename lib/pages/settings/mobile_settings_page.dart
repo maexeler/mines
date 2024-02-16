@@ -52,7 +52,7 @@ class _CellSizeWidgetState extends State<CellSizeWidget> {
   }
 
   void dispose() {
-    widget.settingsProvider.percentCellSize = _value;
+    // widget.settingsProvider.percentCellSize = _value;
     super.dispose();
   }
 
@@ -64,12 +64,12 @@ class _CellSizeWidgetState extends State<CellSizeWidget> {
         Text('Choose the size of the Minefields'),
         Slider(
           min: 0,
-          max: 1.00,
+          max: 1,
           value: _value,
           onChanged: (double value) {
             setState(() {
               _value = value;
-              // widget.settingsProvider.percentCellSize = value;
+              widget.settingsProvider.percentCellSize = value;
             });
           },
         ),
@@ -77,8 +77,7 @@ class _CellSizeWidgetState extends State<CellSizeWidget> {
           // This Row is only used to center its content
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            SizeableCellsWidget(shortSide, _value,
-                widget.settingsProvider.maxCellsForShortSide),
+            SizeableCellsWidget(shortSide, widget.settingsProvider),
           ],
         ),
       ],
@@ -87,16 +86,13 @@ class _CellSizeWidgetState extends State<CellSizeWidget> {
 }
 
 class SizeableCellsWidget extends StatelessWidget {
-  SizeableCellsWidget(
-      this.shortestSide, this.percentCellSize, this.maxCellsForShortSide);
+  SizeableCellsWidget(this.shortestSide, this.settings);
   final double shortestSide;
-  final double percentCellSize;
-  final double maxCellsForShortSide;
+  final SettingsProvider settings;
 
   @override
   Widget build(BuildContext context) {
-    var cellSize = shortestSide / maxCellsForShortSide;
-    cellSize += cellSize * percentCellSize;
+    var cellSize = settings.calcCellSize(shortestSide);
     return Column(
       children: [
         for (var i = 0; i < 4; i++)
