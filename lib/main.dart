@@ -1,17 +1,27 @@
 import 'package:flutter/material.dart';
+import 'package:fullscreen_window/fullscreen_window.dart';
+import 'package:mines/pages/settings/settings_provider.dart';
 import 'package:provider/provider.dart';
 
 import 'package:mines/model/mines.dart';
 import 'package:mines/model/mines_timer.dart';
 import 'package:mines/pages/mines_page/mines_page.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  SettingsProvider settingsProvider = await SettingsProvider()
+    ..initialize();
+
   MinesTimer minesTimer = MinesTimer();
-  MinesGame minesGame = MinesGame(11, 18, timer: minesTimer);
+  MinesGame minesGame =
+      MinesGame(timer: minesTimer, settings: settingsProvider);
+
+  FullScreenWindow.setFullScreen(true);
 
   runApp(
     MultiProvider(
       providers: [
+        Provider(create: (_) => settingsProvider),
         ChangeNotifierProvider(create: (_) => minesTimer),
         ChangeNotifierProvider(create: (_) => minesGame),
       ],
@@ -32,6 +42,7 @@ class MinesApp extends StatelessWidget {
         useMaterial3: true,
       ),
       home: const MinesPage('Solvable Minesweeper'),
+      debugShowCheckedModeBanner: false,
     );
   }
 }

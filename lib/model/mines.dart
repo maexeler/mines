@@ -2,23 +2,25 @@ import 'package:flutter/foundation.dart';
 import 'package:mines/model/mines_definitions.dart';
 import 'package:mines/model/mines_logic.dart';
 import 'package:mines/model/mines_timer.dart';
+import 'package:mines/pages/settings/settings_provider.dart';
+import 'package:vibration/vibration.dart';
 
 class MinesGame extends ChangeNotifier {
   int _w, _h;
-  MineField _mineField;
-  GameField _gameField;
+  late MineField _mineField;
+  late GameField _gameField;
   GameStat _state;
   final MinesTimer? _timer;
   int _remainingMines = 0;
   final _undoStack = <(int, GameField)>[];
   bool _showHints = false;
+  SettingsProvider settings;
 
-  MinesGame(this._w, this._h, {MinesTimer? timer})
-      : _mineField = MineField(_w, _h),
-        _gameField = GameField(_w, _h),
+  MinesGame({MinesTimer? timer, required SettingsProvider this.settings})
+      : _w = 0,
+        _h = 0,
         _state = GameStat.unInitialized,
         _timer = timer {
-    // I dont like late, so do initialisation twice
     resetGame();
   }
 
@@ -52,8 +54,8 @@ class MinesGame extends ChangeNotifier {
   }
 
   void uncoverField(int x, int y) {
-    if (gameStatus == GameStat.unInitialized) {
-      startNewGame(x, y, 20);
+    if (gameStatus == GameStat.layouted) {
+      startNewGame(x, y, settings.percentMines);
       return;
     }
 
@@ -105,6 +107,7 @@ class MinesGame extends ChangeNotifier {
       _remainingMines++;
       _processHints();
     }
+    Vibration.vibrate(duration: 100);
     notifyListeners();
   }
 
@@ -119,6 +122,7 @@ class MinesGame extends ChangeNotifier {
     _w = w;
     _h = h;
     resetGame();
+    _gameStatus = GameStat.layouted;
     notifyListeners();
   }
 
@@ -188,8 +192,8 @@ class MinesGame extends ChangeNotifier {
 
   set _gameStatus(GameStat status) {
     switch (status) {
-      case GameStat.unInitialized:
-      // Do nothing
+      case GameStat.layouted: // Do nothing
+      case GameStat.unInitialized: // Do nothing
       case GameStat.initialized:
         _resetUndoStack();
         _timer?.resetTimer();

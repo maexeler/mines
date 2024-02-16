@@ -1,4 +1,4 @@
-enum GameStat { unInitialized, initialized, running, win, gameOver }
+enum GameStat { unInitialized, layouted, initialized, running, win, gameOver }
 
 class FieldValue {
   int _value = empty;

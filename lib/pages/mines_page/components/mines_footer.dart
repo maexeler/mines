@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mines/pages/settings/mobile_settings_page.dart';
 import 'package:provider/provider.dart';
 
 import 'package:mines/model/mines.dart';
@@ -11,33 +12,49 @@ class MinesFooter extends StatelessWidget {
     return Consumer<MinesGame>(
       builder: (context, minesGame, child) => Row(
         children: [
-          ElevatedButton(
-            onPressed: () {
-              minesGame.resetGame();
-            },
-            child: const Text("New Game"),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              minesGame.replayGame();
-            },
-            child: const Text("Try again"),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              minesGame.toggleHints();
-            },
-            child: minesGame.showHints
-                ? const Text("Hide hints")
-                : const Text("Show hints"),
-          ),
-          ElevatedButton(
-            onPressed: minesGame.canUndo
-                ? () {
-                    minesGame.undo();
-                  }
-                : null,
-            child: const Text("Undo"),
+          Expanded(
+            child: Row(
+              children: [
+                IconButton(
+                  onPressed: () {
+                    minesGame.resetGame();
+                  },
+                  icon: Icon(Icons.play_circle),
+                ),
+                IconButton(
+                  onPressed: () {
+                    minesGame.replayGame();
+                  },
+                  icon: Icon(Icons.replay_circle_filled),
+                ),
+                Expanded(
+                  child: IconButton(
+                    icon: Icon(Icons.settings),
+                    onPressed: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => MobileSettingsPage(),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+                IconButton(
+                  onPressed: () {
+                    minesGame.toggleHints();
+                  },
+                  icon: Icon(Icons.help),
+                ),
+                IconButton(
+                  onPressed: minesGame.canUndo
+                      ? () {
+                          minesGame.undo();
+                        }
+                      : null,
+                  icon: Icon(Icons.undo),
+                ),
+              ],
+            ),
           ),
         ],
       ),

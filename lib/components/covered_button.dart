@@ -25,12 +25,13 @@ class _MineButttonState extends State<MineButton> {
                 {widget.game.uncoverField(widget.x, widget.y)}
             },
         onDoubleTap: () => {widget.game.toggleMayBeMine(widget.x, widget.y)},
+        onLongPress: () => {widget.game.toggleMayBeMine(widget.x, widget.y)},
         child: SizedBox(
             width: 500,
             height: 500,
             child: CustomPaint(
-              painter:
-                  _MineButtonPainter(widget.game.valueAt(widget.x, widget.y)),
+              painter: _MineButtonPainter(
+                  widget.game.valueAt(widget.x, widget.y), widget.y == 0),
             )));
   }
 
@@ -54,9 +55,23 @@ class _MineButttonState extends State<MineButton> {
   }
 }
 
+class MineButtonDisplay extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+        width: 500,
+        height: 500,
+        child: CustomPaint(
+          painter: _MineButtonPainter(
+              FieldValue()..value = FieldValue.covered, false),
+        ));
+  }
+}
+
 class _MineButtonPainter extends CustomPainter {
-  _MineButtonPainter(this.fieldValue);
-  FieldValue fieldValue;
+  _MineButtonPainter(this.fieldValue, this.isTopRow);
+  final FieldValue fieldValue;
+  final bool isTopRow;
 
   static Color greyLite = Colors.white;
   static Color greyButton = Colors.grey.shade300;
@@ -189,6 +204,12 @@ class _MineButtonPainter extends CustomPainter {
       ..lineTo(dx, h - dy)
       ..lineTo(0, h);
     canvas.drawPath(path, paint);
+
+    if (isTopRow) {
+      paint.color = greyDark;
+      paint.strokeWidth = 1;
+      canvas.drawLine(Offset(0, 1), Offset(w, 1), paint);
+    }
   }
 
   @override

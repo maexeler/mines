@@ -13,7 +13,7 @@ class MinesTimer extends ChangeNotifier {
   void resetTimer() {
     stopTimer();
     _secondsSinceStart = 0;
-    notifyListeners();
+    // notifyListeners();
   }
 
   void stopTimer() {
