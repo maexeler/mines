@@ -35,6 +35,10 @@ class FieldValue {
     _value = value + _highlightOffset;
   }
 
+  void markExploded() {
+    // TODO
+  }
+
   void unMark() {
     _value = value % _highlightOffset;
   }

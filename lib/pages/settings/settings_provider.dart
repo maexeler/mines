@@ -16,7 +16,6 @@ class SettingsProvider {
   double calcCellSize(double fromShortSide) {
     var cellSize = fromShortSide / _maxCellsForShortSide;
     cellSize = cellSize + cellSize * _percentCellSize;
-    print('SettingsProvider.calcCellSize ${cellSize}');
     return cellSize;
   }
 

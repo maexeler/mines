@@ -30,7 +30,6 @@ class MinesFieldLayout extends StatelessWidget {
     int w = minesGame.width, h = minesGame.height;
     if (minesGame.gameStatus == GameStat.unInitialized) {
       var settings = Provider.of<SettingsProvider>(context);
-      print('settings.percentCellSize ${settings.percentCellSize}');
       return CustomMultiChildLayout(
         delegate: _MinesFieldLayoutCalculatorDelegate(minesGame, settings),
         children: [
