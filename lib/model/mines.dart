@@ -62,8 +62,10 @@ class MinesGame extends ChangeNotifier {
       case UncoverFieldSatus.gameTerminated:
         if (_gameField.state == GameFieldStatus.win) {
           _gameStatus = GameStat.win;
+          Vibration.vibrate(duration: 300);
         } else {
           _gameStatus = GameStat.gameOver;
+          Vibration.vibrate(duration: 300);
         }
     }
     _pushToUndoStack(last);

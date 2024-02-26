@@ -106,16 +106,16 @@ class GameField extends _Grid {
   /// and false if the game has been terminated.
   UncoverFieldSatus uncoverField(int x, int y) {
     _resetHints();
+
+    // Shouldn't do anyting if game is over
+    if (state == GameFieldStatus.win || state == GameFieldStatus.loose) {
+      return UncoverFieldSatus.none;
+    }
+
     final value = getField(x, y);
     // If it's already uncovered do nothing
     if (value.isNumber || value.isEmpty) return UncoverFieldSatus.none;
 
-    // If it's marked as maybeMine set it to covered
-    if (value.isMaybeMine) {
-      setField(x, y, FieldValue.covered);
-      _remainingMines++;
-      return UncoverFieldSatus.done;
-    }
     // If we uncover a mine, it's game over
     if (mineField.getField(x, y).isMine) {
       _gameOver(x, y);
@@ -138,6 +138,12 @@ class GameField extends _Grid {
 
   bool toggleMayBeMine(int x, int y) {
     _resetHints();
+
+    // Shouldn't do anyting if game is over
+    if (state == GameFieldStatus.win || state == GameFieldStatus.loose) {
+      return false;
+    }
+
     if (getField(x, y).isCovered) {
       setField(x, y, FieldValue.maybeMine);
       _remainingMines--;
