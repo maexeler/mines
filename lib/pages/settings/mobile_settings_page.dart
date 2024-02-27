@@ -1,8 +1,8 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:mines/components/covered_button.dart';
-import 'package:mines/pages/settings/settings_provider.dart';
+import 'package:mines/pages/mines_page/components/covered_button.dart';
+import 'package:mines/provider/settings_provider.dart';
 import 'package:provider/provider.dart';
 
 class MobileSettingsPage extends StatelessWidget {
@@ -52,7 +52,7 @@ class _CellSizeWidgetState extends State<CellSizeWidget> {
   }
 
   void dispose() {
-    // widget.settingsProvider.percentCellSize = _value;
+    widget.settingsProvider.percentCellSize = _value;
     super.dispose();
   }
 
@@ -69,7 +69,6 @@ class _CellSizeWidgetState extends State<CellSizeWidget> {
           onChanged: (double value) {
             setState(() {
               _value = value;
-              widget.settingsProvider.percentCellSize = value;
             });
           },
         ),
@@ -77,7 +76,7 @@ class _CellSizeWidgetState extends State<CellSizeWidget> {
           // This Row is only used to center its content
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            SizeableCellsWidget(shortSide, widget.settingsProvider),
+            SizeableCellsWidget(shortSide, _value),
           ],
         ),
       ],
@@ -86,13 +85,13 @@ class _CellSizeWidgetState extends State<CellSizeWidget> {
 }
 
 class SizeableCellsWidget extends StatelessWidget {
-  SizeableCellsWidget(this.shortestSide, this.settings);
+  SizeableCellsWidget(this.shortestSide, this.percent);
   final double shortestSide;
-  final SettingsProvider settings;
+  final double percent;
 
   @override
   Widget build(BuildContext context) {
-    var cellSize = settings.calcCellSize(shortestSide);
+    var cellSize = SettingsProvider.calcCellSize(shortestSide, percent);
     return Column(
       children: [
         for (var i = 0; i < 4; i++)
@@ -125,8 +124,8 @@ class _MinesPercentWidgetState extends State<MinesPercentWidget> {
   @override
   void initState() {
     super.initState();
-    _value = min(widget.settingsProvider.maxPercentMines,
-        widget.settingsProvider.percentMines);
+    _value = min(
+        SettingsProvider.maxPercentMines, widget.settingsProvider.percentMines);
   }
 
   void dispose() {
@@ -141,8 +140,8 @@ class _MinesPercentWidgetState extends State<MinesPercentWidget> {
         Text('Choose the percentage of Mines'),
         Text('${_value.toStringAsFixed(0)}%'),
         Slider(
-          min: widget.settingsProvider.minPercentMines,
-          max: widget.settingsProvider.maxPercentMines,
+          min: SettingsProvider.minPercentMines,
+          max: SettingsProvider.maxPercentMines,
           value: _value,
           onChanged: (double value) {
             setState(() {

@@ -1,29 +1,48 @@
 import 'package:flutter/material.dart';
-import 'package:fullscreen_window/fullscreen_window.dart';
-import 'package:mines/pages/settings/settings_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:fullscreen_window/fullscreen_window.dart';
 
-import 'package:mines/model/mines.dart';
-import 'package:mines/model/mines_timer.dart';
+import 'package:mines/provider/game_provider.dart';
+import 'package:mines/provider/settings_provider.dart';
+import 'package:mines/provider/game_time_provider.dart';
+import 'package:mines/provider/game_status_provider.dart';
+import 'package:mines/provider/game_remaining_mines_provider.dart';
+
+import 'package:mines/model/mines_game.dart';
 import 'package:mines/pages/mines_page/mines_page.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
   SettingsProvider settingsProvider = SettingsProvider();
   settingsProvider.initialize();
 
-  MinesTimer minesTimer = MinesTimer();
-  MinesGame minesGame =
-      MinesGame(timer: minesTimer, settings: settingsProvider);
+  GameProvider gameProvider = GameProvider();
+  MinesTimeProvider minesTimerProvider = MinesTimeProvider();
+  MinesGameStateProvider minesStateProvider = MinesGameStateProvider();
+  RemainingMinesProvider remainingMinesProvider = RemainingMinesProvider();
+
+  // We need a MinesGame but we will access it only by it's providers
+  // ignore: unused_local_variable
+  MinesGame minesGame = MinesGame(
+    timer: minesTimerProvider,
+    gameInterfaceProvider: gameProvider,
+    minesState: minesStateProvider,
+    settings: settingsProvider,
+    remainingMines: remainingMinesProvider,
+  );
 
   FullScreenWindow.setFullScreen(true);
 
   runApp(
     MultiProvider(
       providers: [
-        Provider(create: (_) => settingsProvider),
-        ChangeNotifierProvider(create: (_) => minesTimer),
-        ChangeNotifierProvider(create: (_) => minesGame),
+        // Provider(create: (_) => minesGame),
+        ChangeNotifierProvider(create: (_) => gameProvider),
+        ChangeNotifierProvider(create: (_) => settingsProvider),
+        ChangeNotifierProvider(create: (_) => minesTimerProvider),
+        ChangeNotifierProvider(create: (_) => minesStateProvider),
+        ChangeNotifierProvider(create: (_) => remainingMinesProvider),
       ],
       child: const MinesApp(),
     ),
@@ -38,7 +57,7 @@ class MinesApp extends StatelessWidget {
     return MaterialApp(
       title: 'Solvable Mines',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
         useMaterial3: true,
       ),
       home: const MinesPage('Solvable Minesweeper'),

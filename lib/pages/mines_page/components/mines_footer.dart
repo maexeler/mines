@@ -1,15 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:mines/pages/settings/mobile_settings_page.dart';
+import 'package:mines/provider/game_provider.dart';
 import 'package:provider/provider.dart';
-
-import 'package:mines/model/mines.dart';
 
 class MinesFooter extends StatelessWidget {
   const MinesFooter({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<MinesGame>(
+    return Consumer<GameProvider>(
       builder: (context, minesGame, child) => Row(
         children: [
           Expanded(
@@ -22,9 +21,11 @@ class MinesFooter extends StatelessWidget {
                   icon: Icon(Icons.play_circle),
                 ),
                 IconButton(
-                  onPressed: () {
-                    minesGame.replayGame();
-                  },
+                  onPressed: minesGame.canReplayGame
+                      ? () {
+                          minesGame.replayGame();
+                        }
+                      : null,
                   icon: Icon(Icons.replay_circle_filled),
                 ),
                 Expanded(

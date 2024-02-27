@@ -2,12 +2,12 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:mines/model/mines.dart';
 import 'package:mines/model/mines_definitions.dart';
+import 'package:mines/provider/game_provider.dart';
 
 class MineButton extends StatefulWidget {
   final int x, y;
-  final MinesGame game;
+  final GameProvider game;
 
   const MineButton(this.x, this.y, this.game, {super.key});
   @override
@@ -31,7 +31,7 @@ class _MineButttonState extends State<MineButton> {
             height: 500,
             child: CustomPaint(
               painter: _MineButtonPainter(
-                  widget.game.valueAt(widget.x, widget.y), widget.y == 0),
+                  widget.game.fieldValueAt(widget.x, widget.y), widget.y == 0),
             )));
   }
 

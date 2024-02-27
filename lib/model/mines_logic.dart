@@ -134,7 +134,7 @@ class GameField extends _Grid {
     }
   }
 
-  int get remaingMines => _remainingMines;
+  int get remainingMines => _remainingMines;
 
   bool toggleMayBeMine(int x, int y) {
     _resetHints();
@@ -144,7 +144,7 @@ class GameField extends _Grid {
       return false;
     }
 
-    if (getField(x, y).isCovered) {
+    if (_remainingMines > 0 && getField(x, y).isCovered) {
       setField(x, y, FieldValue.maybeMine);
       _remainingMines--;
       return true;

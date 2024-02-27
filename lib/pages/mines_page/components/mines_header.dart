@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:mines/model/mines_definitions.dart';
 import 'package:provider/provider.dart';
 
-import 'package:mines/model/mines.dart';
-import 'package:mines/model/mines_timer.dart';
+import 'package:mines/provider/game_time_provider.dart';
+import 'package:mines/provider/game_status_provider.dart';
+import 'package:mines/provider/game_remaining_mines_provider.dart';
 
 class MinesHeader extends StatelessWidget {
   const MinesHeader({super.key});
@@ -30,9 +30,9 @@ class MinesHeader extends StatelessWidget {
 class _TimerDisplay extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Consumer<MinesTimer>(
+    return Consumer<MinesTimeProvider>(
       builder: (context, minesTimer, child) => Text(
-        '${minesTimer.time}',
+        '${minesTimer}',
         style: Theme.of(context).textTheme.displaySmall,
       ),
     );
@@ -42,17 +42,24 @@ class _TimerDisplay extends StatelessWidget {
 class _StatusDisplay extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Consumer<MinesGame>(
-      builder: (context, minesGame, child) => Center(
-        child: Text(
-          minesGame.gameStatus == GameStat.gameOver
-              ? '🙁'
-              : minesGame.gameStatus == GameStat.win
-                  ? '😀😀'
-                  : '😀',
-          style: Theme.of(context).textTheme.displaySmall,
-        ),
-      ),
+    return Consumer<MinesGameStateProvider>(
+      builder: (context, minesState, child) {
+        String text = '';
+        switch (minesState.state) {
+          case MinesGameState.won:
+            text = '😀😀';
+          case MinesGameState.lost:
+            text = '🙁🙁';
+          case MinesGameState.solvable:
+            text = '😀';
+          case MinesGameState.solvableWithGuess:
+            text = '😐';
+          case MinesGameState.uninitialized:
+            text = '';
+        }
+        return Center(
+            child: Text(text, style: Theme.of(context).textTheme.displaySmall));
+      },
     );
   }
 }
@@ -60,10 +67,11 @@ class _StatusDisplay extends StatelessWidget {
 class _RemainingMinesDisplay extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Consumer<MinesGame>(builder: (context, minesGame, child) {
-      var mines = ((minesGame.remainingMines ~/ 10) == 0)
-          ? '0${minesGame.remainingMines}'
-          : '${minesGame.remainingMines}';
+    return Consumer<RemainingMinesProvider>(
+        builder: (context, remainingMines, child) {
+      var mines = ((remainingMines.remainingMines ~/ 10) == 0)
+          ? '0${remainingMines.remainingMines}'
+          : '${remainingMines.remainingMines}';
       return Text(
         mines,
         style: Theme.of(context).textTheme.displaySmall,
