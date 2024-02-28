@@ -20,7 +20,7 @@ class MinesGame {
   late GameField _gameField;
   GameStat _state;
   final _undoStack = <GameField>[];
-  // SettingsProvider settings;
+  bool _gameIsSovable = true; // TODO
 
   MinesGame(
       {required MinesTimeProvider timer,
@@ -149,16 +149,19 @@ class MinesGame {
     _minesStateProvider.state = _isGameSolvable;
   }
 
-  MinesGameState get _isGameSolvable => MinesGameState.solvable; // TODO
+  MinesGameState get _isGameSolvable => _gameIsSovable
+      ? MinesGameState.solvable
+      : MinesGameState.solvableWithGuess;
 
   void undo() {
     if (!canUndo) return;
 
     _popFromUndoStack();
     _state = GameStat.running;
-    _gameInterfaceProvider.notifyListeners();
-    _remainingMinesProvider.remainingMines = remainingMines;
+    _timer.resumeTimer();
     _minesStateProvider.state = _isGameSolvable;
+    _remainingMinesProvider.remainingMines = remainingMines;
+    _gameInterfaceProvider.notifyListeners();
   }
 
   bool get canUndo => _undoStack.length > 1;
@@ -181,14 +184,18 @@ class MinesGame {
 
   set _gameStatus(GameStat status) {
     switch (status) {
-      case GameStat.startingUp: // Do nothing
+      case GameStat.startingUp:
+        _timer.resetTimerValue();
       case GameStat.unInitialized:
+        _timer.stopTimer();
+        _timer.resetTimerValue();
+        _remainingMinesProvider.remainingMines = 0;
         _gameInterfaceProvider.notifyListeners();
       case GameStat.initialized:
         _resetUndoStack();
-        _timer.resetTimer();
+        _timer.resetTimerValue();
       case GameStat.running:
-        _timer.startTimer();
+        _timer.resetAndStartTimer();
       case GameStat.win:
         _timer.stopTimer();
         _minesStateProvider.state = MinesGameState.won;
