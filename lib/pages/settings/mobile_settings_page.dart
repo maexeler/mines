@@ -1,7 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:mines/pages/mines_page/components/covered_button.dart';
+import 'package:mines/pages/mines_page/components/mines_button/mines_button.dart';
 import 'package:mines/provider/settings_provider.dart';
 import 'package:provider/provider.dart';
 

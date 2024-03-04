@@ -17,7 +17,8 @@ class MineField extends _Grid {
   ///
   /// [percent] is in 0..100%
   void intitMineField(int xstart, int ystart, double percent) {
-    var mines = _mines = (w * h * percent / 100).round();
+    _mines = (w * h * percent / 100).round();
+    int mines = _mines;
     // Start empty
     fillWith(FieldValue.empty);
 
@@ -113,12 +114,13 @@ class GameField extends _Grid {
     }
 
     final value = getField(x, y);
-    // If it's already uncovered do nothing
-    if (value.isNumber || value.isEmpty) return UncoverFieldSatus.none;
+    // If it's already uncovered or marked do nothing
+    if (value.isNumber || value.isEmpty || value.isMaybeMine)
+      return UncoverFieldSatus.none;
 
     // If we uncover a mine, it's game over
     if (mineField.getField(x, y).isMine) {
-      _gameOver(x, y);
+      _transferToGameOverView(x, y);
       state = GameFieldStatus.loose;
       return UncoverFieldSatus.gameTerminated;
     }
@@ -172,7 +174,10 @@ class GameField extends _Grid {
     if (allreadyProcessed.contains((x, y))) return;
 
     var field = mineField.getField(x, y);
-    setField(x, y, field.value);
+    // Do not uncover falsely marked fields
+    if (!getField(x, y).isMaybeMine) {
+      setField(x, y, field.value);
+    }
     allreadyProcessed.add((x, y));
 
     if (field.isNotEmpty) return;
@@ -195,19 +200,19 @@ class GameField extends _Grid {
     return true;
   }
 
-  void _gameOver(int xlast, ylast) {
+  void _transferToGameOverView(int xlast, ylast) {
     for (int x = 0; x < w; x++) {
       for (int y = 0; y < h; y++) {
-        if (getField(x, y).isMaybeMine && mineField.getField(x, y).isNotMine) {
-          getField(x, y).value = FieldValue.notMaybeMine;
-        } else if (getField(x, y).isCovered) {
+        if (getField(x, y).isMaybeMine) {
+          if (mineField.getField(x, y).isNotMine) {
+            getField(x, y).value = FieldValue.notMaybeMine;
+          }
+        } else {
           getField(x, y).value = mineField.getField(x, y).value;
         }
       }
     }
-    if (mineField.getField(xlast, ylast).isMine) {
-      getField(xlast, ylast).markExploded();
-    }
+    getField(xlast, ylast).markExploded();
   }
 
   bool _solveField() {
@@ -262,13 +267,13 @@ class GameField extends _Grid {
         // Check if all covered fields are mines
         if (fieldInfo.fieldValue - fieldInfo.mayBeMines ==
             fieldInfo.coveredFields.length) {
-          _fields[x][y].mark();
+          _fields[x][y].setHint();
           progress = true;
           continue;
         }
         // Check if remaining field may savely be uncovered
         if (fieldInfo.mayBeMines == fieldInfo.fieldValue) {
-          _fields[x][y].mark();
+          _fields[x][y].setHint();
           progress = true;
           continue;
         }
@@ -291,7 +296,7 @@ class GameField extends _Grid {
   void _resetHints() {
     for (int x = 0; x < w; x++) {
       for (int y = 0; y < h; y++) {
-        _fields[x][y].unMark();
+        _fields[x][y].resetHint();
       }
     }
   }

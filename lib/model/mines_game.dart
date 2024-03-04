@@ -73,9 +73,10 @@ class MinesGame {
       return;
     }
 
-    var last = _gameField.clone();
+    _pushToUndoStack(_gameField.clone());
     switch (_gameField.uncoverField(x, y)) {
       case UncoverFieldSatus.none:
+        _popFromUndoStack();
         return;
       case UncoverFieldSatus.done:
         ; // nothing extra to do
@@ -88,7 +89,7 @@ class MinesGame {
           Vibration.vibrate(duration: 300);
         }
     }
-    _pushToUndoStack(last);
+
     _gameInterfaceProvider.notifyListeners();
   }
 

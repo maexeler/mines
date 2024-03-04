@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:mines/model/mines_definitions.dart';
+import 'package:mines/pages/mines_page/components/mines_button/mines_button_painter.dart';
 import 'package:mines/provider/game_provider.dart';
 
 class MineButton extends StatefulWidget {
@@ -32,6 +33,9 @@ class _MineButttonState extends State<MineButton> {
             child: CustomPaint(
               painter: _MineButtonPainter(
                   widget.game.fieldValueAt(widget.x, widget.y), widget.y == 0),
+              // Fake, show all possible values for visual debugging
+              // FieldValue()..value = widget.y,
+              // widget.y == 0), // TODO
             )));
   }
 
@@ -98,7 +102,7 @@ class _MineButtonPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     paintEmpty(canvas, size);
 
-    if (fieldValue.isMarked) {
+    if (fieldValue.isHint) {
       var ox = 0.1 * size.width, oy = 0.1 * size.height;
 
       var paint = Paint()
@@ -112,26 +116,24 @@ class _MineButtonPainter extends CustomPainter {
     if (fieldValue.isCovered) {
       paintCovered(canvas, size);
     } else if (fieldValue.isMine) {
-      paintMine(canvas, size);
+      paintMine(canvas, size, fieldValue.isExploded);
     } else if (fieldValue.isMaybeMine) {
-      paintMayBeMine(canvas, size);
+      paintMayBeMine(canvas, size, false);
     } else if (fieldValue.isNumber) {
       paintField(canvas, size, fieldValue.value);
     } else if (fieldValue.isNotMaybeMine) {
-      paintNotMayBeMine(canvas, size);
+      paintMayBeMine(canvas, size, true);
     }
   }
 
-  void paintMine(Canvas canvas, Size size) {
-    paintField(canvas, size, FieldValue.mine, anyChar: 'm'); // TODO
+  void paintMine(Canvas canvas, Size size, bool exploded) {
+    minePainter(canvas, size, 0.05 * size.width, exploded);
   }
 
-  void paintMayBeMine(Canvas canvas, Size size) {
-    paintField(canvas, size, FieldValue.mine, anyChar: 'f'); // TODO
-  }
-
-  void paintNotMayBeMine(Canvas canvas, Size size) {
-    paintField(canvas, size, FieldValue.mine, anyChar: 'nf'); // TODO
+  void paintMayBeMine(Canvas canvas, Size size, bool isNotMayBeMine) {
+    paintCovered(canvas, size);
+    flagPainter(canvas, size, 0.15 * size.width,
+        isNotMayBeMine: isNotMayBeMine);
   }
 
   void paintField(Canvas canvas, Size size, int value, {String? anyChar}) {

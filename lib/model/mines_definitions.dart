@@ -2,7 +2,7 @@ enum GameStat { startingUp, unInitialized, initialized, running, win, gameOver }
 
 class FieldValue {
   int _value = empty;
-  bool get isMine => (_value % _highlightOffset) == mine;
+  bool get isMine => isExploded || (_value % _highlightOffset) == mine;
   bool get isNotMine => !isMine;
   bool get isEmpty => (_value % _highlightOffset) == empty;
   bool get isNotEmpty => !isEmpty;
@@ -14,6 +14,10 @@ class FieldValue {
   bool get isUncovered => !isCovered;
   bool get isMaybeMine => (_value % _highlightOffset) == maybeMine;
   bool get isNotMaybeMine => (_value % _highlightOffset) == notMaybeMine;
+
+  bool get isHint => _value > 100;
+
+  bool get isExploded => _value == mine + 20;
 
   // Value handling
   set value(int value) {
@@ -28,19 +32,20 @@ class FieldValue {
 
   int get value => _value % _highlightOffset;
 
-  // Handle marking
-  bool get isMarked => _value > 100;
+  // Hint handling
 
-  void mark() {
+  void setHint() {
     _value = value + _highlightOffset;
   }
 
-  void markExploded() {
-    // TODO
+  void resetHint() {
+    _value = value % _highlightOffset;
   }
 
-  void unMark() {
-    _value = value % _highlightOffset;
+  // Marking for exploded
+
+  void markExploded() {
+    _value += 20;
   }
 
   static int empty = 0;
