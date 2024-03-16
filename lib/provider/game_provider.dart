@@ -50,6 +50,8 @@ class GameProvider extends ChangeNotifier {
 
   bool get isStarting => _game.gameStatus == GameStat.startingUp;
 
+  bool get isSolving => _game.gameStatus == GameStat.calculating;
+
   bool get needsRecalculationOfGameDimensions =>
       _game.gameStatus == GameStat.unInitialized;
 

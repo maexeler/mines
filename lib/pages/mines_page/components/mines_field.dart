@@ -23,12 +23,10 @@ class MinesFieldLayout extends StatelessWidget {
     GameProvider game = Provider.of<GameProvider>(context);
     // We are not ready to show the game contents
     if (game.isStarting) {
-      print('render starting');
       return Container();
     } else
     // Calculate the game size for the given display space
     if (game.needsRecalculationOfGameDimensions) {
-      print('render calculating');
       var settings = Provider.of<SettingsProvider>(context);
       return CustomMultiChildLayout(
         delegate: _MinesFieldLayoutCalculatorDelegate(game, settings),
@@ -39,29 +37,40 @@ class MinesFieldLayout extends StatelessWidget {
           ),
         ],
       );
-    } else {
-      // Render the game content
-      print('render game');
-      int w = game.width, h = game.height;
-      Map<({int x, int y}), MineButton> fields = {};
-      for (int x = 0; x < w; x++) {
-        for (int y = 0; y < h; y++) {
-          fields[(x: x, y: y)] = MineButton(x, y, game);
-        }
-      }
-      return CustomMultiChildLayout(
-        delegate: _MinesFieldLayoutDelegate(w, h),
-        children: <Widget>[
-          for (final MapEntry<({int x, int y}), MineButton> entry
-              in fields.entries)
-            LayoutId(
-              id: entry.key,
-              child: entry.value,
-            ),
+    } else if (game.isSolving) {
+      return Stack(
+        children: [
+          gameContent(game),
+          Center(
+            child: const CircularProgressIndicator(),
+          )
         ],
       );
+    } else {
+      return gameContent(game);
     }
   }
+}
+
+Widget gameContent(GameProvider game) {
+  // Render the game content
+  int w = game.width, h = game.height;
+  Map<({int x, int y}), MineButton> fields = {};
+  for (int x = 0; x < w; x++) {
+    for (int y = 0; y < h; y++) {
+      fields[(x: x, y: y)] = MineButton(x, y, game);
+    }
+  }
+  return CustomMultiChildLayout(
+    delegate: _MinesFieldLayoutDelegate(w, h),
+    children: <Widget>[
+      for (final MapEntry<({int x, int y}), MineButton> entry in fields.entries)
+        LayoutId(
+          id: entry.key,
+          child: entry.value,
+        ),
+    ],
+  );
 }
 
 class _MinesFieldLayoutCalculatorDelegate extends MultiChildLayoutDelegate {
@@ -109,11 +118,6 @@ class _MinesFieldLayoutDelegate extends MultiChildLayoutDelegate {
           (x: x, y: y),
           BoxConstraints(maxHeight: fieldSize, maxWidth: fieldSize),
         );
-        // assert(currentSize == Size(fieldSize, fieldSize));
-        // positionChild must be called to change the position of a child from
-        // what it was in the previous layout. Each child starts at (0, 0) for
-        // the first layout.
-        // print('$x, $y $currentSize');
         positionChild(
             (x: x, y: y), Offset(dx + (x * fieldSize), y * fieldSize));
       }

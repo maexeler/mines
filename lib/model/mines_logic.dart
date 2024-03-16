@@ -10,7 +10,7 @@ class MineField extends _Grid {
 
   MineField(int w, int h) : super(w, h, FieldValue.empty);
 
-  get totalMines => _mines;
+  int get totalMines => _mines;
 
   /// Create an actual mine field by placing [percent] mines on the field
   /// and calculating the values of all it's neigbours.
@@ -92,7 +92,7 @@ class GameField extends _Grid {
   }
 
   /// return true if this game is solvable
-  bool isSolvableGame() {
+  bool isGameSolvable() {
     while (_solveField()) {}
     if (_gameSolved()) {
       state = GameFieldStatus.solvable;

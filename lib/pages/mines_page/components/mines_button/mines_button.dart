@@ -19,24 +19,25 @@ class _MineButttonState extends State<MineButton> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-        onTap: () => {
-              if (isModifierPressed)
-                {widget.game.toggleMayBeMine(widget.x, widget.y)}
-              else
-                {widget.game.uncoverField(widget.x, widget.y)}
-            },
-        onDoubleTap: () => {widget.game.toggleMayBeMine(widget.x, widget.y)},
-        onLongPress: () => {widget.game.toggleMayBeMine(widget.x, widget.y)},
-        child: SizedBox(
-            width: 500,
-            height: 500,
-            child: CustomPaint(
-              painter: _MineButtonPainter(
-                  widget.game.fieldValueAt(widget.x, widget.y), widget.y == 0),
-              // Fake, show all possible values for visual debugging
-              // FieldValue()..value = widget.y,
-              // widget.y == 0), // TODO
-            )));
+      onTap: () => {
+        if (isModifierPressed)
+          {widget.game.toggleMayBeMine(widget.x, widget.y)}
+        else
+          {widget.game.uncoverField(widget.x, widget.y)}
+      },
+      onDoubleTap: () => {widget.game.toggleMayBeMine(widget.x, widget.y)},
+      onLongPress: () => {widget.game.toggleMayBeMine(widget.x, widget.y)},
+      child: SizedBox(
+        width: 500,
+        height: 500,
+        child: CustomPaint(
+          painter: _MineButtonPainter(
+            widget.game.fieldValueAt(widget.x, widget.y),
+            widget.y == 0,
+          ),
+        ),
+      ),
+    );
   }
 
   bool isModifierPressed = false;

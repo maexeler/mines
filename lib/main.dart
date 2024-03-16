@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:mines/provider/full_screen_provider.dart';
 import 'package:provider/provider.dart';
-import 'package:fullscreen_window/fullscreen_window.dart';
 
 import 'package:mines/provider/game_provider.dart';
 import 'package:mines/provider/settings_provider.dart';
@@ -13,6 +13,9 @@ import 'package:mines/pages/mines_page/mines_page.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  FullScreenProvider fullScreenProvider = FullScreenProvider();
+  fullScreenProvider.initialize();
 
   SettingsProvider settingsProvider = SettingsProvider();
   settingsProvider.initialize();
@@ -29,20 +32,18 @@ Future<void> main() async {
     gameInterfaceProvider: gameProvider,
     minesState: minesStateProvider,
     settings: settingsProvider,
-    remainingMines: remainingMinesProvider,
+    remainingMinesProvider: remainingMinesProvider,
   );
-
-  FullScreenWindow.setFullScreen(true);
 
   runApp(
     MultiProvider(
       providers: [
-        // Provider(create: (_) => minesGame),
         ChangeNotifierProvider(create: (_) => gameProvider),
         ChangeNotifierProvider(create: (_) => settingsProvider),
         ChangeNotifierProvider(create: (_) => minesTimerProvider),
         ChangeNotifierProvider(create: (_) => minesStateProvider),
         ChangeNotifierProvider(create: (_) => remainingMinesProvider),
+        ChangeNotifierProvider(create: (_) => fullScreenProvider),
       ],
       child: const MinesApp(),
     ),
@@ -60,7 +61,7 @@ class MinesApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
         useMaterial3: true,
       ),
-      home: const MinesPage('Solvable Minesweeper'),
+      home: const MinesPage(),
       debugShowCheckedModeBanner: false,
     );
   }

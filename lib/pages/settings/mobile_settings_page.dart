@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:mines/pages/mines_page/components/mines_button/mines_button.dart';
+import 'package:mines/provider/full_screen_provider.dart';
 import 'package:mines/provider/settings_provider.dart';
 import 'package:provider/provider.dart';
 
@@ -9,6 +10,7 @@ class MobileSettingsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var settingsProvider = Provider.of<SettingsProvider>(context);
+    var fullScreenProvider = Provider.of<FullScreenProvider>(context);
     return Scaffold(
       appBar: AppBar(
         title: Text('Settings'),
@@ -19,14 +21,27 @@ class MobileSettingsPage extends StatelessWidget {
             Card(
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
+                child: FullScreenWidget(fullScreenProvider),
+              ),
+            ),
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: MinesTimeoutWidget(settingsProvider),
+              ),
+            ),
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
                 child: MinesPercentWidget(settingsProvider),
               ),
             ),
             Card(
-                child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: CellSizeWidget(settingsProvider),
-            )),
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: CellSizeWidget(settingsProvider),
+              ),
+            ),
           ],
         ),
       ),
@@ -183,6 +198,115 @@ class _MinesPercentWidgetState extends State<MinesPercentWidget> {
                 }),
           ],
         )
+      ],
+    );
+  }
+}
+
+class MinesTimeoutWidget extends StatefulWidget {
+  MinesTimeoutWidget(this.settingsProvider);
+  final SettingsProvider settingsProvider;
+
+  @override
+  State<MinesTimeoutWidget> createState() => _MinesTimeoutWidgetState();
+}
+
+class _MinesTimeoutWidgetState extends State<MinesTimeoutWidget> {
+  int _value = 5;
+
+  @override
+  void initState() {
+    super.initState();
+    _value = widget.settingsProvider.timeOut;
+  }
+
+  void dispose() {
+    widget.settingsProvider.timeOut = _value;
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Text('Choose the solver time'),
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Expanded(
+              child: RadioListTile<int>(
+                  title: Text('5'),
+                  value: 5,
+                  groupValue: _value,
+                  onChanged: (value) {
+                    if (value == null) return;
+                    setState(() {
+                      _value = value;
+                    });
+                  }),
+            ),
+            Expanded(
+              child: RadioListTile<int>(
+                  title: Text('15'),
+                  value: 15,
+                  groupValue: _value,
+                  onChanged: (value) {
+                    if (value == null) return;
+                    setState(() {
+                      _value = value;
+                    });
+                  }),
+            ),
+            Expanded(
+              child: RadioListTile<int>(
+                  title: Text('25'),
+                  value: 25,
+                  groupValue: _value,
+                  onChanged: (value) {
+                    if (value == null) return;
+                    setState(() {
+                      _value = value;
+                    });
+                  }),
+            ),
+          ],
+        )
+      ],
+    );
+  }
+}
+
+class FullScreenWidget extends StatefulWidget {
+  FullScreenWidget(this.fullScreenProvider);
+  final FullScreenProvider fullScreenProvider;
+
+  @override
+  State<FullScreenWidget> createState() => _FullScreenWidgetState();
+}
+
+class _FullScreenWidgetState extends State<FullScreenWidget> {
+  bool _value = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _value = widget.fullScreenProvider.isFullScreenMode;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Checkbox(
+            value: _value,
+            onChanged: (value) {
+              if (value == null) return;
+              setState(() {
+                _value = value;
+                widget.fullScreenProvider.fullSceenMode = _value;
+              });
+            }),
+        Text('Full screen mode'),
       ],
     );
   }

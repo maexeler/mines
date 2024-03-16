@@ -18,9 +18,11 @@ class MinesFooter extends StatelessWidget {
               child: Row(
                 children: [
                   IconButton(
-                    onPressed: () {
-                      minesGame.resetGame();
-                    },
+                    onPressed: minesGame.isSolving
+                        ? null
+                        : () {
+                            minesGame.resetGame();
+                          },
                     icon: Icon(Icons.play_circle),
                   ),
                   IconButton(

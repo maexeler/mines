@@ -1,6 +1,6 @@
-import 'package:flutter/foundation.dart';
 import 'package:mines/model/mines_definitions.dart';
 import 'package:mines/model/mines_logic.dart';
+import 'package:mines/model/solver.dart';
 import 'package:mines/provider/game_provider.dart';
 import 'package:mines/provider/game_remaining_mines_provider.dart';
 import 'package:mines/provider/game_status_provider.dart';
@@ -16,23 +16,23 @@ class MinesGame {
   final RemainingMinesProvider _remainingMinesProvider;
 
   int _w, _h;
-  late MineField _mineField;
+  // late MineField _mineField;
   late GameField _gameField;
   GameStat _state;
   final _undoStack = <GameField>[];
-  bool _gameIsSovable = true; // TODO
+  bool _gameIsSovable = true;
 
   MinesGame(
       {required MinesTimeProvider timer,
       required SettingsProvider settings,
       required GameProvider gameInterfaceProvider,
       required MinesGameStateProvider minesState,
-      required RemainingMinesProvider remainingMines})
+      required RemainingMinesProvider remainingMinesProvider})
       : _timer = timer,
         _settingsProvider = settings,
         _minesStateProvider = minesState,
         _gameInterfaceProvider = gameInterfaceProvider,
-        _remainingMinesProvider = remainingMines,
+        _remainingMinesProvider = remainingMinesProvider,
         _w = 0,
         _h = 0,
         _state = GameStat.startingUp {
@@ -49,21 +49,24 @@ class MinesGame {
   void startNewGame(int xs, int ys, double percent) {
     assert(xs >= 0 && xs < _w);
     assert(ys >= 0 && ys < _h);
-    // Generate and solve the game
-    do {
-      _generateNewGame(xs, ys, percent);
-    } while (!_gameField.isSolvableGame());
 
-    if (kDebugMode) {
-      print('Game solved:');
-      _gameField.dump();
-    }
+    _gameStatus = GameStat.calculating;
+    _gameInterfaceProvider.notifyListeners();
 
-    // now start the game
-    _gameField.initFromMineField(_mineField, xs, ys);
-    _gameStatus = GameStat.running;
-    _pushToUndoStack(_gameField.clone());
-    _checkForWin(); // It may happen, that we have won on start
+    getNewGameField(_w, _h, xs, ys, percent, _settingsProvider.timeOut)
+        .then((value) {
+      _gameField = value;
+      _gameStatus = GameStat.running;
+      _minesStateProvider.state = _gameField.state == GameFieldStatus.solvable
+          ? MinesGameState.solvable
+          : MinesGameState.solvableWithGuess;
+
+      _pushToUndoStack(_gameField.clone());
+      _checkForWin(); // It may happen, that we have won on start
+      _remainingMinesProvider.remainingMines = value.remainingMines;
+      _gameInterfaceProvider.notifyListeners();
+    });
+    _gameStatus = GameStat.calculating;
     _gameInterfaceProvider.notifyListeners();
   }
 
@@ -116,7 +119,6 @@ class MinesGame {
   int get width => _w;
   int get height => _h;
   GameStat get gameStatus => _state;
-  int get remainingMines => _gameField.remainingMines;
   FieldValue valueAt(int x, int y) => _gameField.getField(x, y);
 
   /// Change the size of the game
@@ -129,7 +131,7 @@ class MinesGame {
   }
 
   void resetGame() {
-    _mineField = MineField(_w, _h);
+    // _mineField = MineField(_w, _h);
     _gameField = GameField(_w, _h);
     _gameStatus = GameStat.unInitialized;
     _gameInterfaceProvider.notifyListeners();
@@ -146,7 +148,7 @@ class MinesGame {
     _popAllButOneFromUndoStack();
     _gameStatus = GameStat.running;
     _gameInterfaceProvider.notifyListeners();
-    _remainingMinesProvider.remainingMines = remainingMines;
+    _remainingMinesProvider.remainingMines = _gameField.remainingMines;
     _minesStateProvider.state = _isGameSolvable;
   }
 
@@ -161,19 +163,11 @@ class MinesGame {
     _state = GameStat.running;
     _timer.resumeTimer();
     _minesStateProvider.state = _isGameSolvable;
-    _remainingMinesProvider.remainingMines = remainingMines;
+    _remainingMinesProvider.remainingMines = _gameField.remainingMines;
     _gameInterfaceProvider.notifyListeners();
   }
 
   bool get canUndo => _undoStack.length > 1;
-
-  void _generateNewGame(int xs, int ys, double percent) {
-    resetGame();
-    _mineField.intitMineField(xs, ys, percent);
-    _gameField.initFromMineField(_mineField, xs, ys);
-    _remainingMinesProvider.remainingMines = remainingMines;
-    _minesStateProvider.state = _isGameSolvable;
-  }
 
   void _checkForWin() {
     if (_gameField.state == GameFieldStatus.win) {
@@ -192,6 +186,8 @@ class MinesGame {
         _timer.resetTimerValue();
         _remainingMinesProvider.remainingMines = 0;
         _gameInterfaceProvider.notifyListeners();
+      case GameStat.calculating:
+        ; // Do nothing
       case GameStat.initialized:
         _resetUndoStack();
         _timer.resetTimerValue();
