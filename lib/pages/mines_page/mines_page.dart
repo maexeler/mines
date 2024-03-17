@@ -4,10 +4,42 @@ import 'package:mines/pages/mines_page/components/mines_field.dart';
 import 'package:mines/pages/mines_page/components/mines_footer.dart';
 import 'package:mines/pages/mines_page/components/mines_header.dart';
 import 'package:mines/provider/full_screen_provider.dart';
+import 'package:mines/provider/game_provider.dart';
+import 'package:mines/provider/game_time_provider.dart';
 import 'package:provider/provider.dart';
 
-class MinesPage extends StatelessWidget {
-  const MinesPage({super.key});
+class MinesPage extends StatefulWidget {
+  const MinesPage(this.gameProvider, this._minesTimeProvider, {super.key});
+  final MinesTimeProvider _minesTimeProvider;
+  final GameProvider gameProvider;
+
+  @override
+  State<MinesPage> createState() => _MinesPageState();
+}
+
+class _MinesPageState extends State<MinesPage> {
+  late final AppLifecycleListener _lifecycleListener;
+
+  @override
+  void initState() {
+    super.initState();
+    _lifecycleListener = AppLifecycleListener(
+      onResume: () {
+        if (widget.gameProvider.isRunning) {
+          widget._minesTimeProvider.resumeTimer();
+        }
+      },
+      onPause: () {
+        widget._minesTimeProvider.stopTimer();
+      },
+    );
+  }
+
+  @override
+  void dispose() {
+    _lifecycleListener.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {

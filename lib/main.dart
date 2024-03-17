@@ -55,13 +55,16 @@ class MinesApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    MinesTimeProvider minesTimeProvider =
+        Provider.of<MinesTimeProvider>(context);
+    GameProvider gameProvider = Provider.of<GameProvider>(context);
     return MaterialApp(
       title: 'Solvable Mines',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
         useMaterial3: true,
       ),
-      home: const MinesPage(),
+      home: MinesPage(gameProvider, minesTimeProvider),
       debugShowCheckedModeBanner: false,
     );
   }

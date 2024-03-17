@@ -190,14 +190,15 @@ class GameField extends _Grid {
   }
 
   bool _gameSolved() {
+    int revealedFields = 0;
     for (int x = 0; x < w; x++) {
       for (int y = 0; y < h; y++) {
-        if (getField(x, y).isCovered && mineField.getField(x, y).isNotMine)
-          return false;
+        if (getField(x, y).isNumber || getField(x, y).isEmpty) {
+          revealedFields++;
+        }
       }
     }
-    // Only covered mines remaining, we have a win
-    return true;
+    return revealedFields + mineField.totalMines == w * h;
   }
 
   void _transferToGameOverView(int xlast, ylast) {
