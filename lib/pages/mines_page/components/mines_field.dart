@@ -80,14 +80,26 @@ class _MinesFieldLayoutCalculatorDelegate extends MultiChildLayoutDelegate {
 
   @override
   void performLayout(Size size) {
+    int w, h;
     var shortSide = size.shortestSide;
     var longestSide = size.longestSide;
-    var cellSize =
-        SettingsProvider.calcCellSize(shortSide, settings.percentCellSize);
-    int w = (shortSide / cellSize).floor();
-    int h = (longestSide / cellSize).floor();
+    if (size.width < size.height) {
+      // Portrait mode
+      var cellSize =
+          SettingsProvider.calcCellSize(shortSide, settings.percentCellSize);
+      w = (shortSide / cellSize).floor();
+      h = (longestSide / cellSize).floor();
+    } else {
+      // Landscape mode
+      var cellSize = SettingsProvider.calcCellSize(
+          shortSide, settings.percentCellSize * size.aspectRatio);
+      h = (shortSide / cellSize).floor();
+      w = (longestSide / cellSize).floor();
+    }
+
     SchedulerBinding.instance.addPostFrameCallback((_) {
       game.changeGameDimensions(w, h);
+      // print('GameDimensions($w,$h)');
     });
 
     layoutChild(
@@ -109,8 +121,19 @@ class _MinesFieldLayoutDelegate extends MultiChildLayoutDelegate {
 
   @override
   void performLayout(Size size) {
-    var fieldSize = min(size.width / w, size.height / h);
-    double dx = (size.shortestSide - (fieldSize * w)) / 2;
+    // print('layout dimensions($w,$h)');
+    double fieldSize = min(size.width / w, size.height / h);
+
+    // In case it doesn't fit, center it
+    double dx;
+    if (size.width < size.height) {
+      // Portrait mode
+      dx = (size.shortestSide - (fieldSize * w)) / 2;
+    } else {
+      // landscape mode
+      dx = (size.longestSide - (fieldSize * w)) / 2;
+    }
+
     for (int x = 0; x < w; x++) {
       for (int y = 0; y < h; y++) {
         // layoutChild must be called exactly once for each child.

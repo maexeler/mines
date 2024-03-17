@@ -7,7 +7,8 @@ void minePainter(Canvas canvas, Size size, double offset, bool exploded) {
       size.height - 2 * offset + 1);
   if (exploded) {
     paint.color = Color(0xffff0000);
-    canvas.drawRect(rect, paint);
+    canvas.drawRect(
+        Rect.fromLTWH(0, 0, size.width - 1, size.height - 1), paint);
   }
   Offset center = Offset(size.width / 2, size.height / 2);
 

@@ -6,44 +6,110 @@ import 'package:mines/provider/full_screen_provider.dart';
 import 'package:mines/provider/settings_provider.dart';
 import 'package:provider/provider.dart';
 
-class MobileSettingsPage extends StatelessWidget {
+class LayoutSettingsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var settingsProvider = Provider.of<SettingsProvider>(context);
     var fullScreenProvider = Provider.of<FullScreenProvider>(context);
+    bool isPortraitMode =
+        MediaQuery.orientationOf(context) == Orientation.portrait;
     return Scaffold(
       appBar: AppBar(
-        title: Text('Settings'),
+        title: Text('Layout settings'),
       ),
       body: SingleChildScrollView(
-        child: Column(
-          children: [
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: FullScreenWidget(fullScreenProvider),
+        child: isPortraitMode
+            ? Column(
+                children: [
+                  Card(
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: FullScreenWidget(fullScreenProvider),
+                    ),
+                  ),
+                  Card(
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: CellSizeWidget(settingsProvider),
+                    ),
+                  ),
+                ],
+              )
+            : Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: Card(
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: CellSizeWidget(settingsProvider),
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    child: Card(
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: FullScreenWidget(fullScreenProvider),
+                      ),
+                    ),
+                  ),
+                ],
               ),
-            ),
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: MinesTimeoutWidget(settingsProvider),
+      ),
+    );
+  }
+}
+
+class DifficultySettingsPage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    var settingsProvider = Provider.of<SettingsProvider>(context);
+    bool isPortraitMode =
+        MediaQuery.orientationOf(context) == Orientation.portrait;
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Difficulty settings'),
+      ),
+      body: SingleChildScrollView(
+        child: isPortraitMode
+            ? Column(
+                children: [
+                  Card(
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: MinesPercentWidget(settingsProvider),
+                    ),
+                  ),
+                  Card(
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: MinesTimeoutWidget(settingsProvider),
+                    ),
+                  ),
+                ],
+              )
+            : Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: Card(
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: MinesPercentWidget(settingsProvider),
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    child: Card(
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: MinesTimeoutWidget(settingsProvider),
+                      ),
+                    ),
+                  ),
+                ],
               ),
-            ),
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: MinesPercentWidget(settingsProvider),
-              ),
-            ),
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: CellSizeWidget(settingsProvider),
-              ),
-            ),
-          ],
-        ),
       ),
     );
   }

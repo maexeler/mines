@@ -37,25 +37,41 @@ class MinesFooter extends StatelessWidget {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        IconButton(
+                        PopupMenuButton(
                           icon: Icon(Icons.settings),
-                          onPressed: () {
-                            Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (context) => MobileSettingsPage(),
-                              ),
-                            );
-                          },
-                        ),
-                        IconButton(
-                          icon: Icon(Icons.info),
-                          onPressed: () {
-                            Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (context) => InfoPage(),
-                              ),
-                            );
-                          },
+                          itemBuilder: (context) => [
+                            PopupMenuItem(
+                              child: Text('About'),
+                              onTap: () {
+                                Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                    builder: (context) => InfoPage(),
+                                  ),
+                                );
+                              },
+                            ),
+                            PopupMenuItem(
+                              child: Text('Layout'),
+                              onTap: () {
+                                Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                    builder: (context) => LayoutSettingsPage(),
+                                  ),
+                                );
+                              },
+                            ),
+                            PopupMenuItem(
+                              child: Text('Difficulty'),
+                              onTap: () {
+                                Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        DifficultySettingsPage(),
+                                  ),
+                                );
+                              },
+                            ),
+                          ],
                         ),
                       ],
                     ),

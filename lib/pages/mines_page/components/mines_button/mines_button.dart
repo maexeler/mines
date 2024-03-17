@@ -171,8 +171,8 @@ class _MineButtonPainter extends CustomPainter {
 
     paint.color = greyDark;
     paint.style = PaintingStyle.stroke;
-    paint.strokeWidth = 2;
-    canvas.drawRect(Rect.fromLTRB(1, 1, size.width, size.height), paint);
+    paint.strokeWidth = 1;
+    canvas.drawRect(Rect.fromLTRB(0, 0, size.width, size.height), paint);
   }
 
   void paintCovered(Canvas canvas, Size size) {
