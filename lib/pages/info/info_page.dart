@@ -126,13 +126,13 @@ class AboutMe extends StatelessWidget {
                       children: [
                         TextSpan(
                           text: '''Hi I am Max
-I used to play Minesweeper classic from 'Dev Null' for years on occasion. But with the latest update he added advertising which sucks.
-So I decided to write my own game with all the bells and whistles I ever wanted.
+I’ve been playing the Minesweeper classic from 'Dev Null' for years, but with the latest update, he added ads, which sucks.
+So I decided to write my own game with all the bells and whistles I always wanted.
 I promise:
 \t\u25CF no advertising
 \t\u25CF no tracking
 \t\u25CF no analytics
-Ever.
+Never ever.
 \nYou can find the source code at ''',
                           style: TextStyle(color: Colors.black),
                         ),
