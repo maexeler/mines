@@ -76,6 +76,10 @@ class MinesGame {
       return;
     }
 
+    if (gameStatus == GameStat.calculating) {
+      return;
+    }
+
     _pushToUndoStack(_gameField.clone());
     switch (_gameField.uncoverField(x, y)) {
       case UncoverFieldSatus.none:
