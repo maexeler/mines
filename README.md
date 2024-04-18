@@ -19,7 +19,7 @@ The code is too sparsely commented, even for myself. I'm sorry about that, but i
 
 ### Supported Devices
 The code runs on Android devices (phones & tablets). It should work on Apple devices too.
-Web and desktop apps are not supported. It should be possible to run the code on this devices too but you have to rewrite the code in [mines_field.dart](./lib/pages/mines_page/mines_page.dart) at least.
+Web and desktop apps are not supported. It should be possible to run the code on this devices too but you have to rewrite the code in [mines_field.dart](./lib/pages/mines_page/components/mines_field.dart) at least.
 
 ## Project structure
 
