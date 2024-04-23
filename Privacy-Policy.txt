@@ -1,0 +1,1 @@
+Minesweeper does not collect, analyze or process any data about you.
