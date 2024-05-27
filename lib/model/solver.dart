@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
-import 'package:mines/model/mines_logic.dart';
+import 'package:Minesweeper/model/mines_logic.dart';
 
 Future<GameField> getNewGameField(
     int w, int h, int xs, int ys, double percent, int timeOut) async {

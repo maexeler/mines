@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:mines/provider/full_screen_provider.dart';
+import 'package:Minesweeper/provider/full_screen_provider.dart';
 import 'package:provider/provider.dart';
 
-import 'package:mines/provider/game_provider.dart';
-import 'package:mines/provider/settings_provider.dart';
-import 'package:mines/provider/game_time_provider.dart';
-import 'package:mines/provider/game_status_provider.dart';
-import 'package:mines/provider/game_remaining_mines_provider.dart';
+import 'package:Minesweeper/provider/game_provider.dart';
+import 'package:Minesweeper/provider/settings_provider.dart';
+import 'package:Minesweeper/provider/game_time_provider.dart';
+import 'package:Minesweeper/provider/game_status_provider.dart';
+import 'package:Minesweeper/provider/game_remaining_mines_provider.dart';
 
-import 'package:mines/model/mines_game.dart';
-import 'package:mines/pages/mines_page/mines_page.dart';
+import 'package:Minesweeper/model/mines_game.dart';
+import 'package:Minesweeper/pages/mines_page/mines_page.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();

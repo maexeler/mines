@@ -1,11 +1,11 @@
-import 'package:mines/model/mines_definitions.dart';
-import 'package:mines/model/mines_logic.dart';
-import 'package:mines/model/solver.dart';
-import 'package:mines/provider/game_provider.dart';
-import 'package:mines/provider/game_remaining_mines_provider.dart';
-import 'package:mines/provider/game_status_provider.dart';
-import 'package:mines/provider/game_time_provider.dart';
-import 'package:mines/provider/settings_provider.dart';
+import 'package:Minesweeper/model/mines_definitions.dart';
+import 'package:Minesweeper/model/mines_logic.dart';
+import 'package:Minesweeper/model/solver.dart';
+import 'package:Minesweeper/provider/game_provider.dart';
+import 'package:Minesweeper/provider/game_remaining_mines_provider.dart';
+import 'package:Minesweeper/provider/game_status_provider.dart';
+import 'package:Minesweeper/provider/game_time_provider.dart';
+import 'package:Minesweeper/provider/settings_provider.dart';
 import 'package:vibration/vibration.dart';
 
 class MinesGame {

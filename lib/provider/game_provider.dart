@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
-import 'package:mines/model/mines_game.dart';
-import 'package:mines/model/mines_definitions.dart';
+import 'package:Minesweeper/model/mines_game.dart';
+import 'package:Minesweeper/model/mines_definitions.dart';
 
 /// This class serves as a clean abstraction of what a mines game is.
 ///

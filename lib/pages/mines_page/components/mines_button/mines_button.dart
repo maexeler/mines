@@ -2,9 +2,9 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:mines/model/mines_definitions.dart';
-import 'package:mines/pages/mines_page/components/mines_button/mines_button_painter.dart';
-import 'package:mines/provider/game_provider.dart';
+import 'package:Minesweeper/model/mines_definitions.dart';
+import 'package:Minesweeper/pages/mines_page/components/mines_button/mines_button_painter.dart';
+import 'package:Minesweeper/provider/game_provider.dart';
 
 class MineButton extends StatefulWidget {
   final int x, y;

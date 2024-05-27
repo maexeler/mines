@@ -1,6 +1,6 @@
 import 'dart:math' as math;
 import 'package:flutter/foundation.dart';
-import 'package:mines/model/mines_definitions.dart';
+import 'package:Minesweeper/model/mines_definitions.dart';
 
 /// A MineField holds the true state of the game
 ///

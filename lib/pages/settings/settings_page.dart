@@ -1,9 +1,9 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:mines/pages/mines_page/components/mines_button/mines_button.dart';
-import 'package:mines/provider/full_screen_provider.dart';
-import 'package:mines/provider/settings_provider.dart';
+import 'package:Minesweeper/pages/mines_page/components/mines_button/mines_button.dart';
+import 'package:Minesweeper/provider/full_screen_provider.dart';
+import 'package:Minesweeper/provider/settings_provider.dart';
 import 'package:provider/provider.dart';
 
 class LayoutSettingsPage extends StatelessWidget {

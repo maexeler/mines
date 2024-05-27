@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:mines/pages/info/info_page.dart';
-import 'package:mines/pages/settings/settings_page.dart';
-import 'package:mines/provider/game_provider.dart';
+import 'package:Minesweeper/pages/info/info_page.dart';
+import 'package:Minesweeper/pages/settings/settings_page.dart';
+import 'package:Minesweeper/provider/game_provider.dart';
 import 'package:provider/provider.dart';
 
 class MinesFooter extends StatelessWidget {

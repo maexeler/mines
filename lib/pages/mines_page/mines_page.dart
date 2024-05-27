@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 
-import 'package:mines/pages/mines_page/components/mines_field.dart';
-import 'package:mines/pages/mines_page/components/mines_footer.dart';
-import 'package:mines/pages/mines_page/components/mines_header.dart';
-import 'package:mines/provider/full_screen_provider.dart';
-import 'package:mines/provider/game_provider.dart';
-import 'package:mines/provider/game_time_provider.dart';
+import 'package:Minesweeper/pages/mines_page/components/mines_field.dart';
+import 'package:Minesweeper/pages/mines_page/components/mines_footer.dart';
+import 'package:Minesweeper/pages/mines_page/components/mines_header.dart';
+import 'package:Minesweeper/provider/full_screen_provider.dart';
+import 'package:Minesweeper/provider/game_provider.dart';
+import 'package:Minesweeper/provider/game_time_provider.dart';
 import 'package:provider/provider.dart';
 
 class MinesPage extends StatefulWidget {
