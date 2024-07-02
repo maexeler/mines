@@ -9,53 +9,49 @@ enum GameStat {
 }
 
 class FieldValue {
-  int _value = empty;
-  bool get isMine => isExploded || (_value % _highlightOffset) == mine;
+  int get value => _bitValue & _valueMask;
+
+  set value(int newValue) {
+    assert(newValue >= empty && newValue < _toBigValue);
+    _bitValue = newValue;
+  }
+
+  bool get isMine => value == mine;
+  bool get isEmpty => value == empty;
+  bool get isNumber => value >= 1 && value <= 8;
+
   bool get isNotMine => !isMine;
-  bool get isEmpty => (_value % _highlightOffset) == empty;
   bool get isNotEmpty => !isEmpty;
-  bool get isNumber =>
-      (_value % _highlightOffset) >= 1 && (_value % _highlightOffset) <= 8;
   bool get isNotNumber => !isNumber;
 
-  bool get isCovered => (_value % _highlightOffset) == covered;
+  bool get isCovered => value == covered;
   bool get isUncovered => !isCovered;
-  bool get isMaybeMine => (_value % _highlightOffset) == maybeMine;
-  bool get isNotMaybeMine => (_value % _highlightOffset) == notMaybeMine;
+  bool get isMaybeMine => value == maybeMine;
+  bool get isNotAMaybeMine => value == notAMaybeMine;
 
-  bool get isHint => _value > 100;
-
-  bool get isExploded => _value == mine + 20;
-
-  // Value handling
-  set value(int value) {
-    assert(value >= empty && value <= notMaybeMine);
-    _value = value;
-  }
-
-  void add(int value) {
-    _value += value;
-    assert(isNumber);
-  }
-
-  int get value => _value % _highlightOffset;
+  bool get isHint => _bitValue & _hintBit == _hintBit;
+  bool get isExploded => _bitValue & _explodedBit == _explodedBit;
 
   // Hint handling
-
+  //
   void setHint() {
-    _value = value + _highlightOffset;
+    _bitValue = _bitValue | _hintBit;
   }
 
   void resetHint() {
-    _value = value % _highlightOffset;
+    _bitValue = _bitValue & ~_hintBit;
   }
 
-  // Marking for exploded
-
+  // Mark the game over bomb as such
+  //
   void markExploded() {
-    _value += 20;
+    _bitValue = _bitValue | _explodedBit;
   }
 
+  int _bitValue = empty;
+
+  // Field values for MineField and GameField
+  //
   static int empty = 0;
   static int one = 1;
   static int two = 2;
@@ -67,10 +63,17 @@ class FieldValue {
   static int eight = 8;
   static int mine = 9;
 
-  static int covered = 10;
-  static int uncovered = 11;
-  static int maybeMine = 12;
-  static int notMaybeMine = 13;
+  // Field values for GameField only
+  //
+  static int covered = 10; // field is covered
+  static int maybeMine = 11; // field is marked as mine
+  static int notAMaybeMine = 12; // field is falsely marked as mine
 
-  static const int _highlightOffset = 150;
+  static int _toBigValue =
+      notAMaybeMine + 1; // only values less then _toBigValue are allowed
+
+  static int _valueMask = 15;
+
+  static int _hintBit = 16;
+  static int _explodedBit = 32;
 }

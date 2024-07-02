@@ -122,7 +122,7 @@ class _MineButtonPainter extends CustomPainter {
       paintMayBeMine(canvas, size, false);
     } else if (fieldValue.isNumber) {
       paintField(canvas, size, fieldValue.value);
-    } else if (fieldValue.isNotMaybeMine) {
+    } else if (fieldValue.isNotAMaybeMine) {
       paintMayBeMine(canvas, size, true);
     }
   }

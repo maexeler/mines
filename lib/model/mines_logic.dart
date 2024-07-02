@@ -206,7 +206,7 @@ class GameField extends _Grid {
       for (int y = 0; y < h; y++) {
         if (getField(x, y).isMaybeMine) {
           if (mineField.getField(x, y).isNotMine) {
-            getField(x, y).value = FieldValue.notMaybeMine;
+            getField(x, y).value = FieldValue.notAMaybeMine;
           }
         } else {
           getField(x, y).value = mineField.getField(x, y).value;
