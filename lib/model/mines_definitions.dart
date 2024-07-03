@@ -25,8 +25,9 @@ class FieldValue {
   bool get isNotNumber => !isNumber;
 
   bool get isCovered => value == covered;
-  bool get isUncovered => !isCovered;
   bool get isMaybeMine => value == maybeMine;
+
+  bool get isUncovered => !isCovered;
   bool get isNotAMaybeMine => value == notAMaybeMine;
 
   bool get isHint => _bitValue & _hintBit == _hintBit;

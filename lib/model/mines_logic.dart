@@ -93,8 +93,8 @@ class GameField extends _Grid {
 
   /// return true if this game is solvable
   bool isGameSolvable() {
-    while (_solveField()) {}
-    if (_gameSolved()) {
+    while (_solveFields()) {}
+    if (_isGameSolved()) {
       state = GameFieldStatus.solvable;
       return true;
     } else {
@@ -103,8 +103,8 @@ class GameField extends _Grid {
     }
   }
 
-  /// Returns true if a field was  uncovered
-  /// and false if the game has been terminated.
+  /// Return what has happened to the Field
+  /// or gameTerminated if the game ended.
   UncoverFieldSatus uncoverField(int x, int y) {
     _resetHints();
 
@@ -128,7 +128,7 @@ class GameField extends _Grid {
     _copyAndExpand(x, y, {});
 
     // and check for a win
-    if (_gameSolved()) {
+    if (_isGameSolved()) {
       state = GameFieldStatus.win;
       return UncoverFieldSatus.gameTerminated;
     } else {
@@ -189,7 +189,7 @@ class GameField extends _Grid {
     }
   }
 
-  bool _gameSolved() {
+  bool _isGameSolved() {
     int revealedFields = 0;
     for (int x = 0; x < w; x++) {
       for (int y = 0; y < h; y++) {
@@ -216,17 +216,15 @@ class GameField extends _Grid {
     getField(xlast, ylast).markExploded();
   }
 
-  bool _solveField() {
+  /// return true as long as some progress is made
+  bool _solveFields() {
     for (int x = 0; x < w; x++) {
       for (int y = 0; y < h; y++) {
-        final fieldInfo = _fillInFieldInfo(x, y);
         // We are only interrested in number fields
-        if (fieldInfo.field.isNotNumber) {
+        if (_fields[x][y].isNotNumber) {
           continue;
         }
-        if (fieldInfo.fieldValue == 8) {
-          continue;
-        }
+        final fieldInfo = _fillInFieldInfo(x, y);
         // Check if all covered fields are mines
         if (fieldInfo.coveredFields.isNotEmpty &&
             (fieldInfo.fieldValue - fieldInfo.mayBeMines ==
