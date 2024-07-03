@@ -61,6 +61,10 @@ class MinesGame {
           ? MinesGameState.solvable
           : MinesGameState.solvableWithGuess;
 
+      if (_gameField.state == GameFieldStatus.solvableWithGuess) {
+        Vibration.vibrate(duration: 100);
+      }
+
       _pushToUndoStack(_gameField.clone());
       _checkForWin(); // It may happen, that we have won on start
       _remainingMinesProvider.remainingMines = value.remainingMines;
@@ -176,7 +180,6 @@ class MinesGame {
   void _checkForWin() {
     if (_gameField.state == GameFieldStatus.win) {
       _gameStatus = GameStat.win;
-      Vibration.vibrate(duration: 300);
       _gameInterfaceProvider.notifyListeners();
     }
   }

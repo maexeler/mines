@@ -1,62 +1,32 @@
 import 'dart:math';
-
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+
 import 'package:Minesweeper/model/mines_definitions.dart';
 import 'package:Minesweeper/pages/mines_page/components/mines_button/mines_button_painter.dart';
 import 'package:Minesweeper/provider/game_provider.dart';
 
-class MineButton extends StatefulWidget {
+class MineButton extends StatelessWidget {
   final int x, y;
   final GameProvider game;
 
   const MineButton(this.x, this.y, this.game, {super.key});
-  @override
-  State<MineButton> createState() => _MineButttonState();
-}
 
-class _MineButttonState extends State<MineButton> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => {
-        if (isModifierPressed)
-          {widget.game.toggleMayBeMine(widget.x, widget.y)}
-        else
-          {widget.game.uncoverField(widget.x, widget.y)}
-      },
-      onDoubleTap: () => {widget.game.toggleMayBeMine(widget.x, widget.y)},
-      onLongPress: () => {widget.game.toggleMayBeMine(widget.x, widget.y)},
+      onTap: () => {game.uncoverField(x, y)},
+      onLongPress: () => {game.toggleMayBeMine(x, y)},
       child: SizedBox(
         width: 500,
         height: 500,
         child: CustomPaint(
           painter: _MineButtonPainter(
-            widget.game.fieldValueAt(widget.x, widget.y),
-            widget.y == 0,
+            game.fieldValueAt(x, y),
+            y == 0,
           ),
         ),
       ),
     );
-  }
-
-  bool isModifierPressed = false;
-
-  void _handleKeyDown(RawKeyEvent event) {
-    isModifierPressed =
-        event.isShiftPressed || event.isControlPressed || event.isAltPressed;
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    RawKeyboard.instance.addListener(_handleKeyDown);
-  }
-
-  @override
-  void dispose() {
-    RawKeyboard.instance.removeListener(_handleKeyDown);
-    super.dispose();
   }
 }
 

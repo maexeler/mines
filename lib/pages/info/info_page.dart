@@ -26,7 +26,7 @@ class InfoPage extends StatelessWidget {
 class Instruction extends TopicWidget {
   static final info = [
     (Text('tab a field'), 'to reveale the field content'),
-    (Text('long tab or \ndouble tab a field'), 'to mark a fields as mine'),
+    (Text('long tab a field'), 'to mark a fields as mine'),
   ];
   Instruction() : super('Instructions', info);
 }
