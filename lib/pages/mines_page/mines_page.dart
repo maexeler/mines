@@ -10,6 +10,7 @@ import 'package:provider/provider.dart';
 
 class MinesPage extends StatefulWidget {
   const MinesPage(this.gameProvider, this._minesTimeProvider, {super.key});
+
   final MinesTimeProvider _minesTimeProvider;
   final GameProvider gameProvider;
 
@@ -45,24 +46,22 @@ class _MinesPageState extends State<MinesPage> {
   Widget build(BuildContext context) {
     FullScreenProvider provider = Provider.of<FullScreenProvider>(context);
     if (provider.isFullScreenMode) {
-      return Scaffold(
-        body: minesBody(),
-      );
+      return SafeArea(child: Scaffold(body: minesBody()));
     } else {
-      return Scaffold(
-        appBar: AppBar(
-          title: Text('Minesweeper'), //MinesHeader(),
+      return SafeArea(
+        child: Scaffold(
+          appBar: AppBar(title: Text('Minesweeper')),
+          body: minesBody(),
         ),
-        body: minesBody(),
       );
     }
   }
 }
 
 Widget minesBody() => const Column(
-      children: [
-        MinesHeader(),
-        Expanded(child: MinesFieldWidget()),
-        MinesFooter()
-      ],
-    );
+  children: [
+    MinesHeader(),
+    Expanded(child: MinesFieldWidget()),
+    MinesFooter(),
+  ],
+);
