@@ -17,7 +17,7 @@ class MinesHeader extends StatelessWidget {
             children: [
               _TimerDisplay(),
               Expanded(child: Container()),
-              _RemainingMinesDisplay()
+              _RemainingMinesDisplay(),
             ],
           ),
           _StatusDisplay(),
@@ -52,13 +52,16 @@ class _StatusDisplay extends StatelessWidget {
             text = '🙁🙁';
           case MinesGameState.solvable:
             text = '😀';
+          case MinesGameState.eightField:
+            text = '\u{1F3B1}'; // 8 ball
           case MinesGameState.solvableWithGuess:
             text = '😐';
           case MinesGameState.uninitialized:
             text = '';
         }
         return Center(
-            child: Text(text, style: Theme.of(context).textTheme.displaySmall));
+          child: Text(text, style: Theme.of(context).textTheme.displaySmall),
+        );
       },
     );
   }
@@ -68,15 +71,13 @@ class _RemainingMinesDisplay extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Consumer<RemainingMinesProvider>(
-        builder: (context, remainingMines, child) {
-      var mines = ((remainingMines.remainingMines ~/ 10) == 0)
-          ? '0${remainingMines.remainingMines}'
-          : '${remainingMines.remainingMines}';
-      return Text(
-        mines,
-        style: Theme.of(context).textTheme.displaySmall,
-      );
-    });
+      builder: (context, remainingMines, child) {
+        var mines = ((remainingMines.remainingMines ~/ 10) == 0)
+            ? '0${remainingMines.remainingMines}'
+            : '${remainingMines.remainingMines}';
+        return Text(mines, style: Theme.of(context).textTheme.displaySmall);
+      },
+    );
   }
 }
 

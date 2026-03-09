@@ -16,50 +16,74 @@ class MinesGame {
   final RemainingMinesProvider _remainingMinesProvider;
 
   int _w, _h;
-  // late MineField _mineField;
+
   late GameField _gameField;
   GameStat _state;
   final _undoStack = <GameField>[];
-  bool _gameIsSovable = true;
 
-  MinesGame(
-      {required MinesTimeProvider timer,
-      required SettingsProvider settings,
-      required GameProvider gameInterfaceProvider,
-      required MinesGameStateProvider minesState,
-      required RemainingMinesProvider remainingMinesProvider})
-      : _timer = timer,
-        _settingsProvider = settings,
-        _minesStateProvider = minesState,
-        _gameInterfaceProvider = gameInterfaceProvider,
-        _remainingMinesProvider = remainingMinesProvider,
-        _w = 0,
-        _h = 0,
-        _state = GameStat.startingUp {
+  //bool _gameIsSolvable = true;
+
+  MinesGame({
+    required MinesTimeProvider timer,
+    required SettingsProvider settings,
+    required GameProvider gameInterfaceProvider,
+    required MinesGameStateProvider minesState,
+    required RemainingMinesProvider remainingMinesProvider,
+  }) : _timer = timer,
+       _settingsProvider = settings,
+       _minesStateProvider = minesState,
+       _gameInterfaceProvider = gameInterfaceProvider,
+       _remainingMinesProvider = remainingMinesProvider,
+       _w = 0,
+       _h = 0,
+       _state = GameStat.startingUp {
     _gameInterfaceProvider.initialize(this);
     _settingsProvider.addListener(_waitForSettings);
     resetGame();
     _state = GameStat.startingUp;
   }
 
+  // 8-field support
+  //
+  final int _neededWonGamesInARow = 8;
+  int _wonGamesInARow = 0;
+
+  void _incrementWonGames() {
+    _wonGamesInARow += 1;
+    if (_wonGamesInARow > _neededWonGamesInARow) {
+      _resetWonGames();
+    }
+  }
+
+  void _resetWonGames() {
+    _wonGamesInARow = 0;
+  }
+
+  bool _is8FieldGame() => _wonGamesInARow == _neededWonGamesInARow;
+
   /// Start a new game
   ///
   /// [xs] and [ys] are the location of the first field to uncover
   /// [percent] is the percentage of mines in the game
-  void startNewGame(int xs, int ys, double percent) {
+  void startNewGame(int xs, int ys, double percent, bool is8FieldGame) {
     assert(xs >= 0 && xs < _w);
     assert(ys >= 0 && ys < _h);
 
     _gameStatus = GameStat.calculating;
     _gameInterfaceProvider.notifyListeners();
 
-    getNewGameField(_w, _h, xs, ys, percent, _settingsProvider.timeOut)
-        .then((value) {
+    createSolvableGameField(
+      _w,
+      _h,
+      xs,
+      ys,
+      percent,
+      is8FieldGame,
+      _settingsProvider.timeOut,
+    ).then((value) {
       _gameField = value;
       _gameStatus = GameStat.running;
-      _minesStateProvider.state = _gameField.state == GameFieldStatus.solvable
-          ? MinesGameState.solvable
-          : MinesGameState.solvableWithGuess;
+      _minesStateProvider.state = getSolvableState();
 
       if (_gameField.state == GameFieldStatus.solvableWithGuess) {
         Vibration.vibrate(duration: 100);
@@ -76,7 +100,7 @@ class MinesGame {
 
   void uncoverField(int x, int y) {
     if (gameStatus == GameStat.initialized) {
-      startNewGame(x, y, _settingsProvider.percentMines);
+      startNewGame(x, y, _settingsProvider.percentMines, _is8FieldGame());
       return;
     }
 
@@ -93,9 +117,11 @@ class MinesGame {
         ; // nothing extra to do
       case UncoverFieldSatus.gameTerminated:
         if (_gameField.state == GameFieldStatus.win) {
+          _incrementWonGames();
           _gameStatus = GameStat.win;
           Vibration.vibrate(duration: 300);
         } else {
+          _resetWonGames();
           _gameStatus = GameStat.gameOver;
           Vibration.vibrate(duration: 300);
         }
@@ -125,8 +151,11 @@ class MinesGame {
   }
 
   int get width => _w;
+
   int get height => _h;
+
   GameStat get gameStatus => _state;
+
   FieldValue valueAt(int x, int y) => _gameField.getField(x, y);
 
   /// Change the size of the game
@@ -157,12 +186,18 @@ class MinesGame {
     _gameStatus = GameStat.running;
     _gameInterfaceProvider.notifyListeners();
     _remainingMinesProvider.remainingMines = _gameField.remainingMines;
-    _minesStateProvider.state = _isGameSolvable;
+    _minesStateProvider.state = getSolvableState();
   }
 
-  MinesGameState get _isGameSolvable => _gameIsSovable
-      ? MinesGameState.solvable
-      : MinesGameState.solvableWithGuess;
+  MinesGameState getSolvableState() {
+    if (_gameField.state == GameFieldStatus.solvable) {
+      return MinesGameState.solvable;
+    }
+    if (_gameField.state == GameFieldStatus.solvable8Game) {
+      return MinesGameState.eightField;
+    }
+    return MinesGameState.solvableWithGuess;
+  }
 
   void undo() {
     if (!canUndo) return;
@@ -170,7 +205,7 @@ class MinesGame {
     _popFromUndoStack();
     _state = GameStat.running;
     _timer.resumeTimer();
-    _minesStateProvider.state = _isGameSolvable;
+    _minesStateProvider.state = getSolvableState();
     _remainingMinesProvider.remainingMines = _gameField.remainingMines;
     _gameInterfaceProvider.notifyListeners();
   }

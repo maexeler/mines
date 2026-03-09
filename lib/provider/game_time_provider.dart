@@ -16,7 +16,7 @@ class MinesTimeProvider extends ChangeNotifier {
     _startTimer();
   }
 
-  /// To be calld from the game
+  /// To be called from the game
   void stopTimer() {
     _timer?.cancel();
   }
@@ -35,8 +35,10 @@ class MinesTimeProvider extends ChangeNotifier {
   /// To be called from the game
   void _startTimer() {
     _timer?.cancel();
-    _timer =
-        Timer.periodic(const Duration(milliseconds: 1000), _incrementSeconds);
+    _timer = Timer.periodic(
+      const Duration(milliseconds: 1000),
+      _incrementSeconds,
+    );
   }
 
   void _incrementSeconds(Timer timer) {
@@ -47,6 +49,9 @@ class MinesTimeProvider extends ChangeNotifier {
   @override
   String toString() {
     return format(
-        '{:02d}:{:02d}', _secondsSinceStart ~/ 60, _secondsSinceStart % 60);
+      '{:02d}:{:02d}',
+      _secondsSinceStart ~/ 60,
+      _secondsSinceStart % 60,
+    );
   }
 }
