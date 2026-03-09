@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 enum MinesGameState {
   uninitialized,
   solvable,
+  eightField,
   solvableWithGuess,
   won,
   lost,

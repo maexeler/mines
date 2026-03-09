@@ -14,9 +14,7 @@ class LayoutSettingsPage extends StatelessWidget {
     bool isPortraitMode =
         MediaQuery.orientationOf(context) == Orientation.portrait;
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Layout settings'),
-      ),
+      appBar: AppBar(title: Text('Layout settings')),
       body: SingleChildScrollView(
         child: isPortraitMode
             ? Column(
@@ -68,9 +66,7 @@ class DifficultySettingsPage extends StatelessWidget {
     bool isPortraitMode =
         MediaQuery.orientationOf(context) == Orientation.portrait;
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Difficulty settings'),
-      ),
+      appBar: AppBar(title: Text('Difficulty settings')),
       body: SingleChildScrollView(
         child: isPortraitMode
             ? Column(
@@ -117,6 +113,7 @@ class DifficultySettingsPage extends StatelessWidget {
 
 class CellSizeWidget extends StatefulWidget {
   final SettingsProvider settingsProvider;
+
   CellSizeWidget(this.settingsProvider);
 
   @override
@@ -156,9 +153,7 @@ class _CellSizeWidgetState extends State<CellSizeWidget> {
         Row(
           // This Row is only used to center its content
           mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            SizeableCellsWidget(shortSide, _value),
-          ],
+          children: [SizeableCellsWidget(shortSide, _value)],
         ),
       ],
     );
@@ -167,6 +162,7 @@ class _CellSizeWidgetState extends State<CellSizeWidget> {
 
 class SizeableCellsWidget extends StatelessWidget {
   SizeableCellsWidget(this.shortestSide, this.percent);
+
   final double shortestSide;
   final double percent;
 
@@ -193,6 +189,7 @@ class SizeableCellsWidget extends StatelessWidget {
 
 class MinesPercentWidget extends StatefulWidget {
   MinesPercentWidget(this.settingsProvider);
+
   final SettingsProvider settingsProvider;
 
   @override
@@ -206,7 +203,9 @@ class _MinesPercentWidgetState extends State<MinesPercentWidget> {
   void initState() {
     super.initState();
     _value = min(
-        SettingsProvider.maxPercentMines, widget.settingsProvider.percentMines);
+      SettingsProvider.maxPercentMines,
+      widget.settingsProvider.percentMines,
+    );
   }
 
   void dispose() {
@@ -233,37 +232,40 @@ class _MinesPercentWidgetState extends State<MinesPercentWidget> {
         Column(
           children: [
             RadioListTile<double>(
-                title: Text('Easy'),
-                value: 15,
-                groupValue: _value,
-                onChanged: (value) {
-                  if (value == null) return;
-                  setState(() {
-                    _value = value;
-                  });
-                }),
+              title: Text('Easy'),
+              value: 15,
+              groupValue: _value,
+              onChanged: (value) {
+                if (value == null) return;
+                setState(() {
+                  _value = value;
+                });
+              },
+            ),
             RadioListTile<double>(
-                title: Text('Medium'),
-                value: 20,
-                groupValue: _value,
-                onChanged: (value) {
-                  if (value == null) return;
-                  setState(() {
-                    _value = value;
-                  });
-                }),
+              title: Text('Medium'),
+              value: 20,
+              groupValue: _value,
+              onChanged: (value) {
+                if (value == null) return;
+                setState(() {
+                  _value = value;
+                });
+              },
+            ),
             RadioListTile<double>(
-                title: Text('Hard'),
-                value: 25,
-                groupValue: _value,
-                onChanged: (value) {
-                  if (value == null) return;
-                  setState(() {
-                    _value = value;
-                  });
-                }),
+              title: Text('Hard'),
+              value: 25,
+              groupValue: _value,
+              onChanged: (value) {
+                if (value == null) return;
+                setState(() {
+                  _value = value;
+                });
+              },
+            ),
           ],
-        )
+        ),
       ],
     );
   }
@@ -271,6 +273,7 @@ class _MinesPercentWidgetState extends State<MinesPercentWidget> {
 
 class MinesTimeoutWidget extends StatefulWidget {
   MinesTimeoutWidget(this.settingsProvider);
+
   final SettingsProvider settingsProvider;
 
   @override
@@ -301,42 +304,45 @@ class _MinesTimeoutWidgetState extends State<MinesTimeoutWidget> {
           children: [
             Expanded(
               child: RadioListTile<int>(
-                  title: Text('5'),
-                  value: 5,
-                  groupValue: _value,
-                  onChanged: (value) {
-                    if (value == null) return;
-                    setState(() {
-                      _value = value;
-                    });
-                  }),
+                title: Text('5'),
+                value: 5,
+                groupValue: _value,
+                onChanged: (value) {
+                  if (value == null) return;
+                  setState(() {
+                    _value = value;
+                  });
+                },
+              ),
             ),
             Expanded(
               child: RadioListTile<int>(
-                  title: Text('15'),
-                  value: 15,
-                  groupValue: _value,
-                  onChanged: (value) {
-                    if (value == null) return;
-                    setState(() {
-                      _value = value;
-                    });
-                  }),
+                title: Text('10'),
+                value: 10,
+                groupValue: _value,
+                onChanged: (value) {
+                  if (value == null) return;
+                  setState(() {
+                    _value = value;
+                  });
+                },
+              ),
             ),
             Expanded(
               child: RadioListTile<int>(
-                  title: Text('25'),
-                  value: 25,
-                  groupValue: _value,
-                  onChanged: (value) {
-                    if (value == null) return;
-                    setState(() {
-                      _value = value;
-                    });
-                  }),
+                title: Text('20'),
+                value: 20,
+                groupValue: _value,
+                onChanged: (value) {
+                  if (value == null) return;
+                  setState(() {
+                    _value = value;
+                  });
+                },
+              ),
             ),
           ],
-        )
+        ),
       ],
     );
   }
@@ -344,6 +350,7 @@ class _MinesTimeoutWidgetState extends State<MinesTimeoutWidget> {
 
 class FullScreenWidget extends StatefulWidget {
   FullScreenWidget(this.fullScreenProvider);
+
   final FullScreenProvider fullScreenProvider;
 
   @override
@@ -364,14 +371,15 @@ class _FullScreenWidgetState extends State<FullScreenWidget> {
     return Row(
       children: [
         Checkbox(
-            value: _value,
-            onChanged: (value) {
-              if (value == null) return;
-              setState(() {
-                _value = value;
-                widget.fullScreenProvider.fullSceenMode = _value;
-              });
-            }),
+          value: _value,
+          onChanged: (value) {
+            if (value == null) return;
+            setState(() {
+              _value = value;
+              widget.fullScreenProvider.fullSceenMode = _value;
+            });
+          },
+        ),
         Text('Full screen mode'),
       ],
     );

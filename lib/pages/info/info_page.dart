@@ -6,18 +6,9 @@ class InfoPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('About'),
-      ),
+      appBar: AppBar(title: Text('About')),
       body: SingleChildScrollView(
-        child: Column(
-          children: [
-            Instruction(),
-            State(),
-            Actions(),
-            AboutMe(),
-          ],
-        ),
+        child: Column(children: [Instruction(), State(), Actions(), AboutMe()]),
       ),
     );
   }
@@ -28,6 +19,7 @@ class Instruction extends TopicWidget {
     (Text('tab a field'), 'to reveale the field content'),
     (Text('long tab a field'), 'to mark a fields as mine'),
   ];
+
   Instruction() : super('Instructions', info);
 }
 
@@ -35,9 +27,14 @@ class State extends TopicWidget {
   static final info = [
     (Text('😀'), 'Game is solvable'),
     (Text('😐'), 'Game is only solvable with guessing'),
-    (Text('😀😀'), 'You have won'),
+    (Text('😀😀'), 'You won the game'),
     (Text('🙁🙁'), 'You have lost the game'),
+    (
+      Text('\u{1F3B1}'), // 8 ball
+      'You have unlocked an 8 mines game by solving eight games in a row without a mistake',
+    ),
   ];
+
   State() : super('Game State', info);
 }
 
@@ -48,21 +45,20 @@ class Actions extends TopicWidget {
     (Icon(Icons.help), 'Show a hint'),
     (Icon(Icons.undo), 'Undo the last move'),
   ];
+
   Actions() : super('Game Actions', info);
 }
 
 class TopicWidget extends StatelessWidget {
   TopicWidget(this.title, this.data);
+
   final String title;
   final List<(Widget, String)> data;
 
   @override
   Widget build(BuildContext context) {
     data.map((row) {
-      return TableRow(children: [
-        row.$1,
-        Text(row.$2),
-      ]);
+      return TableRow(children: [row.$1, Text(row.$2)]);
     }).toList();
 
     return Padding(
@@ -70,21 +66,20 @@ class TopicWidget extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Text(
-            '$title',
-            style: Theme.of(context).textTheme.bodyLarge,
-          ),
+          Text('$title', style: Theme.of(context).textTheme.bodyLarge),
           Table(
-            columnWidths: {
-              0: FlexColumnWidth(2),
-              1: FlexColumnWidth(4),
-            },
+            columnWidths: {0: FlexColumnWidth(2), 1: FlexColumnWidth(4)},
             border: TableBorder.all(width: 1, color: Colors.grey),
             children: data.map((row) {
-              return TableRow(children: [
-                Padding(padding: const EdgeInsets.all(8), child: row.$1),
-                Padding(padding: const EdgeInsets.all(8), child: Text(row.$2)),
-              ]);
+              return TableRow(
+                children: [
+                  Padding(padding: const EdgeInsets.all(8), child: row.$1),
+                  Padding(
+                    padding: const EdgeInsets.all(8),
+                    child: Text(row.$2),
+                  ),
+                ],
+              );
             }).toList(),
           ),
         ],
@@ -101,10 +96,7 @@ class AboutMe extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Text(
-            'About me',
-            style: Theme.of(context).textTheme.bodyLarge,
-          ),
+          Text('About me', style: Theme.of(context).textTheme.bodyLarge),
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -141,8 +133,9 @@ Never ever.
                           style: TextStyle(color: Colors.blue),
                           recognizer: TapGestureRecognizer()
                             ..onTap = () {
-                              launchUrl(Uri.parse(
-                                  'https://github.com/maexeler/mines'));
+                              launchUrl(
+                                Uri.parse('https://github.com/maexeler/mines'),
+                              );
                             },
                         ),
                       ],
@@ -150,10 +143,7 @@ Never ever.
                   ),
                 ),
               ),
-              CustomPaint(
-                  painter: Triangle(
-                Colors.grey.shade300,
-              )),
+              CustomPaint(painter: Triangle(Colors.grey.shade300)),
             ],
           ),
         ],
@@ -165,6 +155,7 @@ Never ever.
 // Create a custom triangle
 class Triangle extends CustomPainter {
   final Color backgroundColor;
+
   Triangle(this.backgroundColor);
 
   @override

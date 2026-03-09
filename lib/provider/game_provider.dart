@@ -61,7 +61,7 @@ class GameProvider extends ChangeNotifier {
   // Notifyer
   // --------
 
-  /// To be called whenever the gane field changes
+  /// To be called whenever the game field changes
   void notifyListeners() {
     super.notifyListeners();
   }

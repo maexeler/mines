@@ -7,27 +7,113 @@ import 'package:Minesweeper/model/mines_definitions.dart';
 class MineField extends _Grid {
   final rnd = math.Random();
   int _mines = 0;
+  bool _is8Game = false;
 
   MineField(int w, int h) : super(w, h, FieldValue.empty);
 
   int get totalMines => _mines;
 
+  bool get is8Game => _is8Game;
+
   /// Create an actual mine field by placing [percent] mines on the field
   /// and calculating the values of all it's neigbours.
   ///
   /// [percent] is in 0..100%
-  void intitMineField(int xstart, int ystart, double percent) {
+  void intitMineField(
+    int xstart,
+    int ystart,
+    double percent,
+    bool is8FieldGame,
+  ) {
     _mines = (w * h * percent / 100).round();
     int mines = _mines;
     // Start empty
     fillWith(FieldValue.empty);
 
+    // check for is8FieldGame and handle it appropriately
+    if (is8FieldGame && _check8FieldConstraints(xstart, ystart, mines)) {
+      _generate8FieldGame(xstart, ystart, mines);
+    } else {
+      _generateNormalGame(xstart, ystart, mines);
+    }
+  }
+
+  /// Check constraints to see if it is even possible to generate an 8 filed game
+  bool _check8FieldConstraints(xstart, ystart, mines) {
+    // I need at least 8 mines
+    if (mines < 8) return false;
+    // I need a 3x3 grid and at least one more row or column
+    if (w < 4 && h < 4) return false;
+    // Check against the staring point
+    if ((xstart < 3) && (w - xstart < 3) && (ystart < 3) && (h - ystart < 3))
+      return false;
+    return true;
+  }
+
+  void _generate8FieldGame(int xstart, int ystart, int mines) {
+    // The 8 field needs to have at least one field distance from the sides
+    // as well as from the staring point
+    int x, y;
+    do {
+      x = rnd.nextInt(w - 2) + 1;
+      y = rnd.nextInt(h - 2) + 1;
+    } while ((xstart - x).abs() < 2 || (ystart - y).abs() < 2);
+    // generate the 8 field
+    _fields[x][y].value = FieldValue.eight;
+    // and the bombs around the 8 field
+    _fields[x - 1][y - 1].value = FieldValue.mine;
+    _fields[x - 1][y].value = FieldValue.mine;
+    _fields[x - 1][y + 1].value = FieldValue.mine;
+    _fields[x + 1][y - 1].value = FieldValue.mine;
+    _fields[x + 1][y].value = FieldValue.mine;
+    _fields[x + 1][y + 1].value = FieldValue.mine;
+    _fields[x][y - 1].value = FieldValue.mine;
+    _fields[x][y + 1].value = FieldValue.mine;
+    mines -= 8;
+    // Exclude preoccupieyed fields
+    Set<_FieldIndex> reservedFields = {};
+    reservedFields.add((x, y));
+    reservedFields.add((xstart, ystart));
+
+    // We want an empty border around the bombs
+    reservedFields.add((x - 2, y - 2));
+    reservedFields.add((x - 2, y - 1));
+    reservedFields.add((x - 2, y));
+    reservedFields.add((x - 2, y + 1));
+    reservedFields.add((x - 2, y + 2));
+
+    reservedFields.add((x + 2, y - 2));
+    reservedFields.add((x + 2, y - 1));
+    reservedFields.add((x + 2, y));
+    reservedFields.add((x + 2, y + 1));
+    reservedFields.add((x + 2, y + 2));
+
+    reservedFields.add((x + 1, y + 2));
+    reservedFields.add((x, y + 2));
+    reservedFields.add((x - 1, y + 2));
+
+    reservedFields.add((x + 1, y - 2));
+    reservedFields.add((x, y - 2));
+    reservedFields.add((x - 1, y - 2));
+
+    // Place the rest of the bombs
+    _generateNormalGame(xstart, ystart, mines, reservedFields: reservedFields);
+  }
+
+  void _generateNormalGame(
+    int xstart,
+    int ystart,
+    int mines, {
+    Set<_FieldIndex> reservedFields = const {},
+  }) {
     // Fill in mines
     while (mines > 0) {
       // No bomb at start position and only one bomb at each location
       int x = rnd.nextInt(w);
       int y = rnd.nextInt(h);
-      if (x == xstart && y == ystart || getField(x, y).isMine) {
+      if (x == xstart && y == ystart ||
+          getField(x, y).isMine ||
+          reservedFields.contains((x, y))) {
         continue;
       }
       _fields[x][y].value = FieldValue.mine;
@@ -50,9 +136,10 @@ enum GameFieldStatus {
   unInitialized,
   initialized,
   solvable,
+  solvable8Game,
   solvableWithGuess,
   win,
-  loose
+  loose,
 }
 
 enum UncoverFieldSatus { none, done, gameTerminated }
@@ -81,21 +168,30 @@ class GameField extends _Grid {
       // Transfer the start value ..
       setField(xstart, ystart, mineField.getField(xstart, ystart).value);
       // and all save neighbours
-      Set<_FieldIndex> neighbors =
-          mineField.getNeighbors(xstart, ystart, (value) => value.isNumber);
+      Set<_FieldIndex> neighbors = mineField.getNeighbors(
+        xstart,
+        ystart,
+        (value) => value.isNumber,
+      );
       for (var element in neighbors) {
-        setField(element.$1, element.$2,
-            mineField.getField(element.$1, element.$2).value);
+        setField(
+          element.$1,
+          element.$2,
+          mineField.getField(element.$1, element.$2).value,
+        );
       }
     }
     state = GameFieldStatus.initialized;
   }
 
   /// return true if this game is solvable
-  bool isGameSolvable() {
+  bool isGameSolvable({for8Game = false}) {
     while (_solveFields()) {}
-    if (_isGameSolved()) {
-      state = GameFieldStatus.solvable;
+    if (_isGameSolved(for8Game: for8Game)) {
+      if (for8Game)
+        state = GameFieldStatus.solvable8Game;
+      else
+        state = GameFieldStatus.solvable;
       return true;
     } else {
       state = GameFieldStatus.solvableWithGuess;
@@ -189,7 +285,7 @@ class GameField extends _Grid {
     }
   }
 
-  bool _isGameSolved() {
+  bool _isGameSolved({bool for8Game = false}) {
     int revealedFields = 0;
     for (int x = 0; x < w; x++) {
       for (int y = 0; y < h; y++) {
@@ -198,7 +294,11 @@ class GameField extends _Grid {
         }
       }
     }
-    return revealedFields + mineField.totalMines == w * h;
+    if (for8Game) {
+      return revealedFields + mineField.totalMines == w * h - 1;
+    } else {
+      return revealedFields + mineField.totalMines == w * h;
+    }
   }
 
   void _transferToGameOverView(int xlast, ylast) {
@@ -284,10 +384,16 @@ class GameField extends _Grid {
 
   _FieldInfo _fillInFieldInfo(int x, int y) {
     var res = _FieldInfo(_fields[x][y]);
-    res.uncovered =
-        getNeighbors(x, y, (neighbor) => neighbor.isUncovered).length;
-    res.mayBeMines =
-        getNeighbors(x, y, (neighbor) => neighbor.isMaybeMine).length;
+    res.uncovered = getNeighbors(
+      x,
+      y,
+      (neighbor) => neighbor.isUncovered,
+    ).length;
+    res.mayBeMines = getNeighbors(
+      x,
+      y,
+      (neighbor) => neighbor.isMaybeMine,
+    ).length;
     res.coveredFields = getNeighbors(x, y, (neighbor) => neighbor.isCovered);
     return res;
   }
@@ -349,9 +455,12 @@ class _FieldInfo {
 class _Grid {
   int w, h;
   final List<List<FieldValue>> _fields;
+
   _Grid(this.w, this.h, int initialValue)
-      : _fields = List.generate(w,
-            (i) => List.generate(h, (j) => FieldValue()..value = initialValue));
+    : _fields = List.generate(
+        w,
+        (i) => List.generate(h, (j) => FieldValue()..value = initialValue),
+      );
 
   FieldValue getField(int x, int y) {
     if (x < 0 || x >= w || y < 0 || y >= h) {
@@ -368,7 +477,10 @@ class _Grid {
   }
 
   Set<_FieldIndex> getNeighbors(
-      int x, int y, bool Function(FieldValue val) predicate) {
+    int x,
+    int y,
+    bool Function(FieldValue val) predicate,
+  ) {
     if (x < 0 || x >= w || y < 0 || y >= h) {
       return <_FieldIndex>{}; // edge elements have no neighbors
     }
@@ -380,7 +492,7 @@ class _Grid {
       (x, y + 1),
       (x + 1, y - 1),
       (x + 1, y),
-      (x + 1, y + 1)
+      (x + 1, y + 1),
     ];
     var res = <_FieldIndex>{};
     for (var elem in neighbors) {

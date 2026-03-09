@@ -5,7 +5,7 @@ class SettingsProvider extends ChangeNotifier {
   bool _initialized = false;
   late SharedPreferences _prefs;
 
-  int _timeOut = 15;
+  int _timeOut = 10;
   double _percentMines = 20;
   double _percentCellSize = 0.055;
   static final double _maxCellsForShortSide = 12;
@@ -26,6 +26,7 @@ class SettingsProvider extends ChangeNotifier {
   }
 
   int get timeOut => _timeOut;
+
   void set timeOut(int value) {
     _timeOut = value;
     save();
@@ -33,13 +34,16 @@ class SettingsProvider extends ChangeNotifier {
 
   static final double minPercentMines = 10;
   static final double maxPercentMines = 30;
+
   double get percentMines => _percentMines;
+
   void set percentMines(double value) {
     _percentMines = value;
     save();
   }
 
   double get percentCellSize => _percentCellSize;
+
   void set percentCellSize(double value) {
     _percentCellSize = value;
     save();
