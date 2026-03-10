@@ -36,11 +36,9 @@ class MinesGame {
        _remainingMinesProvider = remainingMinesProvider,
        _w = 0,
        _h = 0,
-       _state = GameStat.startingUp {
+       _state = GameStat.initialized {
     _gameInterfaceProvider.initialize(this);
-    _settingsProvider.addListener(_waitForSettings);
     resetGame();
-    _state = GameStat.startingUp;
   }
 
   // 8-field support
@@ -221,8 +219,6 @@ class MinesGame {
 
   set _gameStatus(GameStat status) {
     switch (status) {
-      case GameStat.startingUp:
-        _timer.resetTimerValue();
       case GameStat.unInitialized:
         _timer.stopTimer();
         _timer.resetTimerValue();
@@ -261,13 +257,6 @@ class MinesGame {
   void _popAllButOneFromUndoStack() {
     while (canUndo) {
       _popFromUndoStack();
-    }
-  }
-
-  void _waitForSettings() {
-    if (_settingsProvider.isInitialized) {
-      _settingsProvider.removeListener(_waitForSettings);
-      _gameStatus = GameStat.unInitialized;
     }
   }
 }

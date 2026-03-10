@@ -21,29 +21,18 @@ class MinesFieldLayout extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     GameProvider game = Provider.of<GameProvider>(context);
-    // We are not ready to show the game contents
-    if (game.isStarting) {
-      return Container();
-    } else
     // Calculate the game size for the given display space
     if (game.needsRecalculationOfGameDimensions) {
       var settings = Provider.of<SettingsProvider>(context);
       return CustomMultiChildLayout(
         delegate: _MinesFieldLayoutCalculatorDelegate(game, settings),
-        children: [
-          LayoutId(
-            id: 'body',
-            child: Container(),
-          ),
-        ],
+        children: [LayoutId(id: 'body', child: Container())],
       );
     } else if (game.isSolving) {
       return Stack(
         children: [
           gameContent(game),
-          Center(
-            child: const CircularProgressIndicator(),
-          )
+          Center(child: const CircularProgressIndicator()),
         ],
       );
     } else {
@@ -65,16 +54,14 @@ Widget gameContent(GameProvider game) {
     delegate: _MinesFieldLayoutDelegate(w, h),
     children: <Widget>[
       for (final MapEntry<({int x, int y}), MineButton> entry in fields.entries)
-        LayoutId(
-          id: entry.key,
-          child: entry.value,
-        ),
+        LayoutId(id: entry.key, child: entry.value),
     ],
   );
 }
 
 class _MinesFieldLayoutCalculatorDelegate extends MultiChildLayoutDelegate {
   _MinesFieldLayoutCalculatorDelegate(this.game, this.settings);
+
   final GameProvider game;
   final SettingsProvider settings;
 
@@ -85,14 +72,18 @@ class _MinesFieldLayoutCalculatorDelegate extends MultiChildLayoutDelegate {
     var longestSide = size.longestSide;
     if (size.width < size.height) {
       // Portrait mode
-      var cellSize =
-          SettingsProvider.calcCellSize(shortSide, settings.percentCellSize);
+      var cellSize = SettingsProvider.calcCellSize(
+        shortSide,
+        settings.percentCellSize,
+      );
       w = (shortSide / cellSize).floor();
       h = (longestSide / cellSize).floor();
     } else {
       // Landscape mode
       var cellSize = SettingsProvider.calcCellSize(
-          shortSide, settings.percentCellSize * size.aspectRatio);
+        shortSide,
+        settings.percentCellSize * size.aspectRatio,
+      );
       h = (shortSide / cellSize).floor();
       w = (longestSide / cellSize).floor();
     }
@@ -117,6 +108,7 @@ class _MinesFieldLayoutCalculatorDelegate extends MultiChildLayoutDelegate {
 
 class _MinesFieldLayoutDelegate extends MultiChildLayoutDelegate {
   _MinesFieldLayoutDelegate(this.w, this.h);
+
   final int w, h;
 
   @override
@@ -137,12 +129,14 @@ class _MinesFieldLayoutDelegate extends MultiChildLayoutDelegate {
     for (int x = 0; x < w; x++) {
       for (int y = 0; y < h; y++) {
         // layoutChild must be called exactly once for each child.
-        layoutChild(
-          (x: x, y: y),
-          BoxConstraints(maxHeight: fieldSize, maxWidth: fieldSize),
-        );
-        positionChild(
-            (x: x, y: y), Offset(dx + (x * fieldSize), y * fieldSize));
+        layoutChild((
+          x: x,
+          y: y,
+        ), BoxConstraints(maxHeight: fieldSize, maxWidth: fieldSize));
+        positionChild((
+          x: x,
+          y: y,
+        ), Offset(dx + (x * fieldSize), y * fieldSize));
       }
     }
   }
