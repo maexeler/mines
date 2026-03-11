@@ -18,7 +18,7 @@ Future<void> main() async {
   fullScreenProvider.initialize();
 
   SettingsProvider settingsProvider = SettingsProvider();
-  settingsProvider.initialize();
+  await settingsProvider.initialize();
 
   GameProvider gameProvider = GameProvider();
   MinesTimeProvider minesTimerProvider = MinesTimeProvider();
@@ -55,8 +55,9 @@ class MinesApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    MinesTimeProvider minesTimeProvider =
-        Provider.of<MinesTimeProvider>(context);
+    MinesTimeProvider minesTimeProvider = Provider.of<MinesTimeProvider>(
+      context,
+    );
     GameProvider gameProvider = Provider.of<GameProvider>(context);
     return MaterialApp(
       title: 'Solvable Mines',

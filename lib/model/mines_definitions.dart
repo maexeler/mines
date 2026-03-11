@@ -1,11 +1,10 @@
 enum GameStat {
-  startingUp,
   unInitialized,
   calculating,
   initialized,
   running,
   win,
-  gameOver
+  gameOver,
 }
 
 class FieldValue {
@@ -17,20 +16,27 @@ class FieldValue {
   }
 
   bool get isMine => value == mine;
+
   bool get isEmpty => value == empty;
+
   bool get isNumber => value >= 1 && value <= 8;
 
   bool get isNotMine => !isMine;
+
   bool get isNotEmpty => !isEmpty;
+
   bool get isNotNumber => !isNumber;
 
   bool get isCovered => value == covered;
+
   bool get isMaybeMine => value == maybeMine;
 
   bool get isUncovered => !isCovered;
+
   bool get isNotAMaybeMine => value == notAMaybeMine;
 
   bool get isHint => _bitValue & _hintBit == _hintBit;
+
   bool get isExploded => _bitValue & _explodedBit == _explodedBit;
 
   // Hint handling

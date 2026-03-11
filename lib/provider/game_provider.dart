@@ -48,8 +48,6 @@ class GameProvider extends ChangeNotifier {
   // Rendering
   // ---------
 
-  bool get isStarting => _game.gameStatus == GameStat.startingUp;
-
   bool get isSolving => _game.gameStatus == GameStat.calculating;
 
   bool get isRunning => _game.gameStatus == GameStat.running;
@@ -64,5 +62,26 @@ class GameProvider extends ChangeNotifier {
   /// To be called whenever the game field changes
   void notifyListeners() {
     super.notifyListeners();
+  }
+
+  // ------
+  // Bugfix
+  // ------
+  //
+  // Redraw the game after startup a second time so the layout
+  // scales appropriately.
+  //
+  // It might be that I don't understand how to use
+  // MultiChildLayoutDelegate.performLayout(size)
+  // God knows why but the size argument is too small on the first run.
+  // --------
+  bool _needsRedraw = true;
+
+  void maybeRedrawGame() async {
+    if (!_needsRedraw) return;
+
+    _needsRedraw = false;
+    await Future.delayed(const Duration(milliseconds: 50));
+    resetGame();
   }
 }

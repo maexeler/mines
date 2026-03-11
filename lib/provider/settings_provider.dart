@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -10,13 +12,14 @@ class SettingsProvider extends ChangeNotifier {
   double _percentCellSize = 0.055;
   static final double _maxCellsForShortSide = 12;
 
-  bool get isInitialized => _initialized;
+  // bool get isInitialized => _initialized;
 
-  void initialize() async {
+  Future<bool> initialize() async {
     _prefs = await SharedPreferences.getInstance();
     load();
     _initialized = true;
     notifyListeners();
+    return true;
   }
 
   static double calcCellSize(double fromShortSide, double percent) {
