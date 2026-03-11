@@ -63,4 +63,25 @@ class GameProvider extends ChangeNotifier {
   void notifyListeners() {
     super.notifyListeners();
   }
+
+  // ------
+  // Bugfix
+  // ------
+  //
+  // Redraw the game after startup a second time so the layout
+  // scales appropriately.
+  //
+  // It might be that I don't understand how to use
+  // MultiChildLayoutDelegate.performLayout(size)
+  // God knows why but the size argument is too small on the first run.
+  // --------
+  bool _needsRedraw = true;
+
+  void maybeRedrawGame() async {
+    if (!_needsRedraw) return;
+
+    _needsRedraw = false;
+    await Future.delayed(const Duration(milliseconds: 50));
+    resetGame();
+  }
 }

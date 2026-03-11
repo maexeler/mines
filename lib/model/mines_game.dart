@@ -166,7 +166,6 @@ class MinesGame {
   }
 
   void resetGame() {
-    // _mineField = MineField(_w, _h);
     _gameField = GameField(_w, _h);
     _gameStatus = GameStat.unInitialized;
     _gameInterfaceProvider.notifyListeners();

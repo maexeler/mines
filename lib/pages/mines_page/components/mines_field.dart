@@ -90,7 +90,7 @@ class _MinesFieldLayoutCalculatorDelegate extends MultiChildLayoutDelegate {
 
     SchedulerBinding.instance.addPostFrameCallback((_) {
       game.changeGameDimensions(w, h);
-      // print('GameDimensions($w,$h)');
+      game.maybeRedrawGame();
     });
 
     layoutChild(
