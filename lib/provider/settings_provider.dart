@@ -1,10 +1,7 @@
-import 'dart:ffi';
-
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SettingsProvider extends ChangeNotifier {
-  bool _initialized = false;
   late SharedPreferences _prefs;
 
   int _timeOut = 10;
@@ -17,7 +14,6 @@ class SettingsProvider extends ChangeNotifier {
   Future<bool> initialize() async {
     _prefs = await SharedPreferences.getInstance();
     load();
-    _initialized = true;
     notifyListeners();
     return true;
   }
